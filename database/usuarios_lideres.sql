@@ -11,61 +11,61 @@ INSERT IGNORE INTO sedes (nombre) VALUES
 ('Administrativo'), ('Yopal');
 
 -- ============================================================
--- USUARIOS
+-- USUARIOS CON CARGOS
 -- ============================================================
 
-INSERT INTO usuarios (usuario, password, nombre, rol) VALUES
+INSERT INTO usuarios (usuario, password, nombre, cargo, rol) VALUES
 
 -- GERENTES (admin)
-('hbenito',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'BENITO GUEVARA HERNAN MATEO',           'admin'),
-('hfajardo',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'FAJARDO RODRIGUEZ HUGO EDUARDO',        'admin'),
-('agarcia',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'GARCIA MOYA ALEX LEOPOLDO',             'admin'),
-('jrestrepo',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RESTREPO MELO JOHN HENRY',              'admin'),
-('mroa',         '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ROA BARRERA MARGARITA MARIA',           'admin'),
-('croa',         '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ROA BARRERA MARIA CLEMENCIA',           'admin'),
-('erodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ EDGAR GERMAN',                'admin'),
-('drodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ CELY DIEGO ALEXANDER',        'admin'),
-('ksanchez',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SANCHEZ HERNANDEZ KELLY JOHANNA',       'admin'),
-('osolano',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SOLANO MARINO OSCAR HENRY',             'admin'),
+('hbenito',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'BENITO GUEVARA HERNAN MATEO',           'GERENTE COMERCIAL',                                    'admin'),
+('hfajardo',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'FAJARDO RODRIGUEZ HUGO EDUARDO',        'GERENTE DE MANTENIMIENTO Y EFICIENCIA PRODUCTIVA',     'admin'),
+('agarcia',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'GARCIA MOYA ALEX LEOPOLDO',             'GERENTE DE PRODUCCION',                                'admin'),
+('jrestrepo',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RESTREPO MELO JOHN HENRY',              'GERENTE GENERAL',                                      'admin'),
+('mroa',         '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ROA BARRERA MARGARITA MARIA',           'GERENTE DE MERCADEO',                                  'admin'),
+('croa',         '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ROA BARRERA MARIA CLEMENCIA',           'GERENTE DE PRODUCCION',                                'admin'),
+('erodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ EDGAR GERMAN',                'GERENTE COMERCIAL',                                    'admin'),
+('drodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ CELY DIEGO ALEXANDER',        'GERENTE LOGISTICO',                                    'admin'),
+('ksanchez',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SANCHEZ HERNANDEZ KELLY JOHANNA',       'GERENTE ESTRATEGICO Y DE MEJORAMIENTO CONTINUO',       'admin'),
+('osolano',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SOLANO MARINO OSCAR HENRY',             'GERENTE CONTABLE Y FINANCIERO',                        'admin'),
 
 -- DIRECTORES (admin)
-('marias',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ARIAS MOLINA MICHAEL DARNYI',           'admin'),
-('acardenas',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CARDENAS BUITRAGO ANGELICA MARIA',      'admin'),
-('ediaz',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'DIAZ FORY EDUAR YAMIL',                 'admin'),
-('bferro',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'FERRO RODRIGUEZ BRIYITH NATALIA',       'admin'),
-('egonzalez',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'GONZALEZ ZUBIETA ELMIRA',               'admin'),
-('jibanez',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'IBANEZ LANDINEZ JUAN MANUEL',           'admin'),
-('ymora',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MORA BARRETO YEISON JULIAN',            'admin'),
-('lmurillo',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MURILLO BARRERO LUZ MERY',              'admin'),
-('mnino',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'NINO GUERRERO MILTON ANDRES',           'admin'),
-('jrios',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RIOS MUNEVAR JOHANNA ANDREA',           'admin'),
-('rrodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ AGUIRRE RICARDO AUGUSTO',     'admin'),
-('krodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ RODRIGUEZ KATHERINE GISELLE', 'admin'),
-('jsanchez',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SANCHEZ MELO JHON ILDEFONSO',           'admin'),
-('gzubieta',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ZUBIETA CASTANEDA GINETH KATHERINE',    'admin'),
-('msanchez',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SANCHEZ IBARRA MIGUEL EDUARDO',         'admin'),
-('amartinez',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MARTINEZ PAREDES ANGIE PAOLA',          'admin'),
+('marias',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ARIAS MOLINA MICHAEL DARNYI',           'DIRECTOR PTOS DE VTA',                                 'admin'),
+('acardenas',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CARDENAS BUITRAGO ANGELICA MARIA',      'DIRECTOR DE POST PROCESO',                             'admin'),
+('ediaz',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'DIAZ FORY EDUAR YAMIL',                 'DIRECTOR MTTO',                                        'admin'),
+('bferro',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'FERRO RODRIGUEZ BRIYITH NATALIA',       'DIRECTOR DE COMPRAS',                                  'admin'),
+('egonzalez',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'GONZALEZ ZUBIETA ELMIRA',               'DIRECTOR PTOS DE VTA',                                 'admin'),
+('jibanez',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'IBANEZ LANDINEZ JUAN MANUEL',           'DIRECTOR TECNICO',                                     'admin'),
+('ymora',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MORA BARRETO YEISON JULIAN',            'DIRECTOR PTOS DE VTA',                                 'admin'),
+('lmurillo',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MURILLO BARRERO LUZ MERY',              'DIRECTOR DE CARTERA',                                  'admin'),
+('mnino',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'NINO GUERRERO MILTON ANDRES',           'DIRECTOR DE MERCADEO',                                 'admin'),
+('jrios',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RIOS MUNEVAR JOHANNA ANDREA',           'DIRECTOR DE GESTION HUMANA',                           'admin'),
+('rrodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ AGUIRRE RICARDO AUGUSTO',     'DIRECTOR PLANTA BENEFICIO',                            'admin'),
+('krodriguez',   '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ RODRIGUEZ KATHERINE GISELLE', 'DIRECTOR PLANTA BENEFICIO',                            'admin'),
+('jsanchez',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SANCHEZ MELO JHON ILDEFONSO',           'DIRECTOR CONTABLE Y FINANCIERO',                       'admin'),
+('gzubieta',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ZUBIETA CASTANEDA GINETH KATHERINE',    'DIRECTOR AUDITORIA',                                   'admin'),
+('msanchez',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'SANCHEZ IBARRA MIGUEL EDUARDO',         'INGENIERO SOPORTE TECNICO',                            'admin'),
+('amartinez',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MARTINEZ PAREDES ANGIE PAOLA',          'OFICIAL DE CUMPLIMIENTO SAGRILAFT, PTEE',              'admin'),
 
 -- JEFES (jefe)
-('yalvarado',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ALVARADO DIAZ YENNY ANDREA',            'jefe'),
-('calfonso',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ALFONSO ROMERO CATALINA',               'jefe'),
-('langulo',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ANGULO SANTAMARIA LIZANDRO',            'jefe'),
-('lardila',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ARDILA MARTINEZ LUCAS',                 'jefe'),
-('sarevalo',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'AREVALO URREGO SEBASTIAN',              'jefe'),
-('wbernate',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'BERNATE CASTRO WILSON ENRIQUE',         'jefe'),
-('tcabana',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CABANA LOZANO TIFFANY ARLETT',          'jefe'),
-('hcampos',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CAMPOS CAMPOS HENRY',                   'jefe'),
-('jcastro',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CASTRO PAEZ JEYLER MAURICIO',           'jefe'),
-('cfontalvo',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'FONTALVO OCHOA CLARA MILENA',           'jefe'),
-('gmarin',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MARIN RAMIREZ GUSTAVO',                 'jefe'),
-('ymontenegro',  '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MONTENEGRO DE RODRIGUEZ YOLANDA',       'jefe'),
-('aperez',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'PEREZ HERRERA ALEXIS',                  'jefe'),
-('cpuentes',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'PUENTES BRINEZ CARLOS FERNANDO',        'jefe'),
-('jrodriguez2',  '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ CASTILLO JOSE OBDULIO',       'jefe'),
-('drodriguez2',  '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ MOYANO DIANA KATHERINE',      'jefe'),
-('eromero',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ROMERO HUERTAS EDGAR ENRIQUE',          'jefe'),
-('cruiz',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RUIZ MANCERA CESAR ALBERTO',            'jefe'),
-('jurrego',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'URREGO MAHECHA JOHAN DAVID',            'jefe');
+('yalvarado',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ALVARADO DIAZ YENNY ANDREA',            'JEFE CENTRO DE DISTRIBUCION TOBERIN',                  'jefe'),
+('calfonso',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ALFONSO ROMERO CATALINA',               'JEFE DE POSPROCESO',                                   'jefe'),
+('langulo',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ANGULO SANTAMARIA LIZANDRO',            'JEFE DE POSPROCESO',                                   'jefe'),
+('lardila',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ARDILA MARTINEZ LUCAS',                 'JEFE DE DESPACHOS',                                    'jefe'),
+('sarevalo',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'AREVALO URREGO SEBASTIAN',              'JEFE DE ARQUITECTURA',                                 'jefe'),
+('wbernate',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'BERNATE CASTRO WILSON ENRIQUE',         'JEFE DE DESPACHOS',                                    'jefe'),
+('tcabana',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CABANA LOZANO TIFFANY ARLETT',          'JEFE DE DESPACHOS',                                    'jefe'),
+('hcampos',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CAMPOS CAMPOS HENRY',                   'JEFE DE DESPACHOS',                                    'jefe'),
+('jcastro',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'CASTRO PAEZ JEYLER MAURICIO',           'JEFE DE DESPACHOS',                                    'jefe'),
+('cfontalvo',    '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'FONTALVO OCHOA CLARA MILENA',           'JEFE DE POSPROCESO',                                   'jefe'),
+('gmarin',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MARIN RAMIREZ GUSTAVO',                 'JEFE DISTRIBUCION DE HUEVOS',                          'jefe'),
+('ymontenegro',  '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'MONTENEGRO DE RODRIGUEZ YOLANDA',       'JEFE DE TESORERIA',                                    'jefe'),
+('aperez',       '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'PEREZ HERRERA ALEXIS',                  'JEFE DE POSPROCESO',                                   'jefe'),
+('cpuentes',     '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'PUENTES BRINEZ CARLOS FERNANDO',        'JEFE DE DESPACHOS',                                    'jefe'),
+('jrodriguez2',  '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ CASTILLO JOSE OBDULIO',       'JEFE DE TRANSPORTE',                                   'jefe'),
+('drodriguez2',  '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RODRIGUEZ MOYANO DIANA KATHERINE',      'JEFE DE PROCESADOS',                                   'jefe'),
+('eromero',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'ROMERO HUERTAS EDGAR ENRIQUE',          'MENSAJERO DE GERENCIA',                                'jefe'),
+('cruiz',        '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'RUIZ MANCERA CESAR ALBERTO',            'JEFE DE DESPACHOS',                                    'jefe'),
+('jurrego',      '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'URREGO MAHECHA JOHAN DAVID',            'JEFE DE DESPACHOS',                                    'jefe');
 
 -- ============================================================
 -- ASIGNAR SEDES A JEFES

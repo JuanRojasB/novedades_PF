@@ -16,7 +16,7 @@
                 <div class="user-info">
                     <div class="user-details">
                         <span class="user-name"><?php echo htmlspecialchars($_SESSION['user']['nombre']); ?></span>
-                        <span class="user-role"><?php echo $_SESSION['user']['rol'] === 'admin' ? 'Administrador' : 'Jefe'; ?></span>
+                        <span class="user-role"><?php echo htmlspecialchars($_SESSION['user']['cargo'] ?? ($_SESSION['user']['rol'] === 'admin' ? 'Administrador' : 'Jefe')); ?></span>
                     </div>
                 </div>
             <?php endif; ?>
