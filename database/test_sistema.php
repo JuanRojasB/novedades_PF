@@ -32,7 +32,7 @@ function check($label, $condition, $detail = '') {
 echo "=== TEST 1: AUTENTICACION ===\n";
 $user = $pdo->query("SELECT * FROM usuarios WHERE usuario='jrios'")->fetch();
 check("jrios existe",           !empty($user));
-check("jrios es admin",         $user['rol'] === 'admin');
+check("jrios es director",       $user['rol'] === 'director');
 check("jrios tiene cargo",      !empty($user['cargo']));
 check("jrios password OK",      password_verify('123456', $user['password']));
 check("jrios cargo correcto",   $user['cargo'] === 'DIRECTOR DE GESTION HUMANA');
@@ -98,8 +98,8 @@ echo "\n=== TEST 6: USUARIOS LIDERES ===\n";
 $totalUsers = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
 check("50 usuarios total",          $totalUsers === 50, "total=$totalUsers");
 
-$admins = $pdo->query("SELECT COUNT(*) FROM usuarios WHERE rol='admin'")->fetchColumn();
-check("Admins >= 26",               $admins >= 26, "admins=$admins");
+$admins = $pdo->query("SELECT COUNT(*) FROM usuarios WHERE rol='director'")->fetchColumn();
+check("Directores >= 26",           $admins >= 26, "directores=$admins");
 
 $jefes = $pdo->query("SELECT COUNT(*) FROM usuarios WHERE rol='jefe'")->fetchColumn();
 check("Jefes >= 19",                $jefes >= 19, "jefes=$jefes");

@@ -6,7 +6,7 @@
         </div>
         <div class="nav-center">
             <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
-            <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol'] === 'admin'): ?>
+            <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol'] === 'director'): ?>
                 <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
                 <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
             <?php endif; ?>
@@ -16,7 +16,7 @@
                 <div class="user-info">
                     <div class="user-details">
                         <span class="user-name"><?php echo htmlspecialchars($_SESSION['user']['nombre']); ?></span>
-                        <span class="user-role"><?php echo htmlspecialchars($_SESSION['user']['cargo'] ?? ($_SESSION['user']['rol'] === 'admin' ? 'Administrador' : 'Jefe')); ?></span>
+                        <span class="user-role"><?php echo htmlspecialchars($_SESSION['user']['cargo'] ?? ($_SESSION['user']['rol'] === 'director' ? 'Director' : 'Jefe')); ?></span>
                     </div>
                 </div>
             <?php endif; ?>

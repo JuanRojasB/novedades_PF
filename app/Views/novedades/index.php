@@ -57,8 +57,8 @@
     </div>
 
 
-    <!-- Estadísticas (solo para admin) -->
-    <?php if ($user['rol'] === 'admin' && !empty($estadisticas)): ?>
+    <!-- Estadísticas (solo para director) -->
+    <?php if ($user['rol'] === 'director' && !empty($estadisticas)): ?>
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-value"><?php echo count($novedades); ?></div>

@@ -71,7 +71,7 @@ class NovedadController extends Controller {
                 $this->redirect('novedades');
             }
         } else {
-            // Si es admin, mostrar todas las sedes
+            // Si es director, mostrar todas las sedes
             $sedeModel = new \Models\Sede();
             $sedesDisponibles = $sedeModel->getAll();
         }
@@ -221,8 +221,8 @@ class NovedadController extends Controller {
         $this->requireAuth();
         $user = $this->getUser();
         
-        // Solo admin puede ver estadísticas
-        if ($user['rol'] !== 'admin') {
+        // Solo director puede ver estadísticas
+        if ($user['rol'] !== 'director') {
             $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
             $this->redirect('novedades');
         }

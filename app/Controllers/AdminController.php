@@ -13,9 +13,9 @@ class AdminController extends Controller {
     public function index() {
         $this->requireAuth();
         
-        // Solo admin puede acceder
+        // Solo director puede acceder
         $user = $this->getUser();
-        if ($user['rol'] !== 'admin') {
+        if ($user['rol'] !== 'director') {
             $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
             $this->redirect('novedades');
         }

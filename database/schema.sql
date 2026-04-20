@@ -15,13 +15,13 @@ CREATE TABLE IF NOT EXISTS usuarios (
     password VARCHAR(255) NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     cargo VARCHAR(150) NULL,
-    rol ENUM('admin', 'jefe') DEFAULT 'jefe',
+    rol ENUM('director', 'jefe') DEFAULT 'jefe',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insertar usuarios
 INSERT INTO usuarios (usuario, password, nombre, cargo, rol) VALUES 
-('admin', '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'Administrador', 'Administrador del Sistema', 'admin'),
+('admin', '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'Administrador', 'Administrador del Sistema', 'director'),
 ('usuario', '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'Usuario Sistema', 'Usuario de Prueba', 'jefe'),
 ('jefe_yopal', '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'Jefe de Yopal', 'Jefe de Despachos', 'jefe'),
 ('jefe_admin', '$2y$10$ILoO.088VKxrOY1Ix6CCbOKK2p1.2Kkl4V7lUmBwf7tgglKso1ul.', 'Jefe Administrativo', 'Jefe Administrativo', 'jefe'),
