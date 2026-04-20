@@ -49,7 +49,8 @@ class Novedad {
             $params[] = $filters['fecha_hasta'];
         }
         
-        $sql .= " ORDER BY n.fecha_novedad DESC, n.created_at DESC";
+        $sql .= " ORDER BY n.created_at DESC, n.fecha_novedad DESC";
+        $sql .= " LIMIT 500";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
