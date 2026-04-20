@@ -167,6 +167,7 @@
 <!-- Modales -->
 <?php require_once APP_PATH . '/Views/admin/modales.php'; ?>
 
-<script src="<?php echo asset_url('js/admin.js'); ?>?v=<?php echo time(); ?>"></script>
+<script>window.APP_BASE_URL = '<?php echo BASE_URL; ?>';</script>
+<script src="<?php echo asset_url('js/admin.js'); ?>"></script>
 
 <?php require_once APP_PATH . '/Views/layouts/footer.php'; ?>

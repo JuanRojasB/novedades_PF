@@ -681,6 +681,26 @@ body {
     background: #2563eb;
 }
 
+.btn-secondary {
+    padding: 0.625rem 1.25rem;
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
 /* ===== FILTROS ===== */
 .filters-card {
     background: #ffffff;
@@ -848,16 +868,21 @@ body {
 }
 
 .btn-icon {
-    background: none;
+    background: #e0f2fe;
     border: none;
-    font-size: 1.25rem;
+    color: #0369a1;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
-    padding: 0.25rem;
-    transition: transform 0.15s ease;
+    padding: 0.3rem 0.75rem;
+    border-radius: 5px;
+    transition: all 0.15s ease;
+    margin-right: 0.25rem;
 }
 
 .btn-icon:hover {
-    transform: scale(1.2);
+    background: #3b82f6;
+    color: #ffffff;
 }
 
 /* ===== ESTADO VACÍO ===== */

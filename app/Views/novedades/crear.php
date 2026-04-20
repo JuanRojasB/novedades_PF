@@ -213,7 +213,6 @@
                     <textarea name="observaciones" rows="4" placeholder="Escriba su respuesta (opcional)"></textarea>
                 </div>
             </div>
-            </div>
 
             <!-- Botones -->
             <div class="form-actions">
@@ -223,6 +222,9 @@
     </div>
 </main>
 
+<script>
+window.APP_BASE_URL = '<?php echo BASE_URL; ?>';
+</script>
 <script src="<?php echo asset_url('js/formulario-dinamico.js'); ?>"></script>
 <script>
 // Inicializar carga dinámica si solo hay 1 sede

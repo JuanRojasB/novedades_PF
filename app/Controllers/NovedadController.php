@@ -123,11 +123,12 @@ class NovedadController extends Controller {
             $datos['zona_geografica'] = null;
         }
         
-        // Campo opcional: nota
-        $datos['nota'] = !empty($_POST['nota']) ? htmlspecialchars($_POST['nota']) : null;
+        // Campo opcional: nota (el form usa name="observaciones")
+        $datos['nota'] = !empty($_POST['observaciones']) ? htmlspecialchars($_POST['observaciones']) : null;
         
-        // Agregar el responsable automáticamente (usuario logueado)
-        $datos['responsable'] = $this->getUser();
+        // Agregar el responsable automáticamente (nombre del usuario logueado)
+        $user = $this->getUser();
+        $datos['responsable'] = $user['nombre'];
         
         // Procesar archivos y guardarlos en la BD
         $archivos_temp = [];
@@ -197,7 +198,7 @@ class NovedadController extends Controller {
                     require_once APP_PATH . '/Helpers/MailHelper.php';
                     $mailer = new \MailHelper();
                     // Correo al área de Gestión Humana
-                    $mailer->enviarNovedad(array_merge($datos, ['responsable' => $datos['responsable']['nombre'] ?? $datos['responsable']]), 'innovacion@pollo-fiesta.com');
+                    $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
                 } catch (\Exception $e) {
                     error_log("Error enviando correo: " . $e->getMessage());
                     // No interrumpir el flujo si falla el correo

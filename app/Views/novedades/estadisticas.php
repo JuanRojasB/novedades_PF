@@ -13,13 +13,19 @@
     <!-- Resumen General -->
     <div class="stats-summary">
         <div class="stat-card-large">
-            <div class="stat-icon">📊</div>
             <div class="stat-content">
                 <div class="stat-value-large"><?php echo number_format($stats['total_novedades']); ?></div>
                 <div class="stat-label-large">Total de Novedades Registradas</div>
             </div>
         </div>
     </div>
+
+    <?php if ($stats['total_novedades'] == 0): ?>
+    <div class="empty-state" style="text-align:center;padding:3rem;">
+        <p style="font-size:1.2rem;color:#64748b;">No hay novedades registradas aún.</p>
+        <a href="<?php echo base_url('novedades/crear'); ?>" class="btn-primary" style="margin-top:1rem;display:inline-block;">Registrar Primera Novedad</a>
+    </div>
+    <?php else: ?>
 
     <!-- Gráficos en Grid -->
     <div class="charts-grid">
@@ -32,7 +38,7 @@
                 <?php foreach ($stats['por_sede'] as $item): ?>
                     <div class="data-row">
                         <span class="data-label"><?php echo htmlspecialchars($item['sede']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo round(($item['total'] / $stats['total_novedades']) * 100, 1); ?>%)</span>
+                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -46,7 +52,7 @@
                 <?php foreach ($stats['por_tipo'] as $item): ?>
                     <div class="data-row">
                         <span class="data-label"><?php echo htmlspecialchars($item['tipo']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo round(($item['total'] / $stats['total_novedades']) * 100, 1); ?>%)</span>
+                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -60,7 +66,7 @@
                 <?php foreach ($stats['por_justificacion'] as $item): ?>
                     <div class="data-row">
                         <span class="data-label"><?php echo htmlspecialchars($item['justificacion']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo round(($item['total'] / $stats['total_novedades']) * 100, 1); ?>%)</span>
+                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -74,7 +80,7 @@
                 <?php foreach ($stats['por_turno'] as $item): ?>
                     <div class="data-row">
                         <span class="data-label"><?php echo htmlspecialchars($item['turno']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo round(($item['total'] / $stats['total_novedades']) * 100, 1); ?>%)</span>
+                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -88,7 +94,7 @@
                 <?php foreach ($stats['descontar_dominical'] as $item): ?>
                     <div class="data-row">
                         <span class="data-label"><?php echo htmlspecialchars($item['descontar_dominical']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo round(($item['total'] / $stats['total_novedades']) * 100, 1); ?>%)</span>
+                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -126,19 +132,21 @@
         <h3>Conclusiones Automáticas</h3>
         <div class="conclusion-content">
             <?php
-            // Calcular conclusiones
             $tipo_mas_comun = $stats['por_tipo'][0] ?? null;
-            $justificadas = array_filter($stats['por_justificacion'], fn($item) => $item['justificacion'] === 'SI')[0]['total'] ?? 0;
-            $sin_justificar = array_filter($stats['por_justificacion'], fn($item) => $item['justificacion'] === 'NO')[0]['total'] ?? 0;
-            $pendientes = array_filter($stats['por_justificacion'], fn($item) => $item['justificacion'] === 'PENDIENTE')[0]['total'] ?? 0;
-            
-            $pct_justificadas = round(($justificadas / $stats['total_novedades']) * 100, 1);
-            $pct_sin_justificar = round(($sin_justificar / $stats['total_novedades']) * 100, 1);
-            $pct_pendientes = round(($pendientes / $stats['total_novedades']) * 100, 1);
+            $justificadas    = 0; $sin_justificar = 0; $pendientes = 0;
+            foreach ($stats['por_justificacion'] as $item) {
+                if ($item['justificacion'] === 'SI')        $justificadas    = $item['total'];
+                elseif ($item['justificacion'] === 'NO')    $sin_justificar  = $item['total'];
+                elseif ($item['justificacion'] === 'PENDIENTE') $pendientes  = $item['total'];
+            }
+            $total = $stats['total_novedades'];
+            $pct_justificadas   = $total > 0 ? round(($justificadas   / $total) * 100, 1) : 0;
+            $pct_sin_justificar = $total > 0 ? round(($sin_justificar / $total) * 100, 1) : 0;
+            $pct_pendientes     = $total > 0 ? round(($pendientes     / $total) * 100, 1) : 0;
             ?>
             <p><strong>Tipo de novedad más recurrente:</strong> <?php echo $tipo_mas_comun ? htmlspecialchars($tipo_mas_comun['tipo']) . ' con ' . $tipo_mas_comun['total'] . ' casos' : 'N/A'; ?></p>
             <p><strong>Estado de justificaciones:</strong> <?php echo $pct_justificadas; ?>% justificadas, <?php echo $pct_sin_justificar; ?>% sin justificación, <?php echo $pct_pendientes; ?>% pendientes.</p>
-            <p><strong>Recomendación:</strong> <?php 
+            <p><strong>Recomendación:</strong> <?php
                 if ($pct_pendientes > 40) {
                     echo 'Se recomienda hacer seguimiento a las justificaciones pendientes para mejorar el control administrativo.';
                 } elseif ($pct_sin_justificar > 30) {
@@ -149,6 +157,8 @@
             ?></p>
         </div>
     </div>
+
+    <?php endif; // fin del else total_novedades > 0 ?>
 
 </main>
 

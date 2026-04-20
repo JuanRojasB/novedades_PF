@@ -13,6 +13,13 @@ class AdminController extends Controller {
     public function index() {
         $this->requireAuth();
         
+        // Solo admin puede acceder
+        $user = $this->getUser();
+        if ($user['rol'] !== 'admin') {
+            $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
+            $this->redirect('novedades');
+        }
+        
         $sedeModel = new Sede();
         $areaModel = new AreaTrabajo();
         $tipoNovedadModel = new TipoNovedad();

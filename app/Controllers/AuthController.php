@@ -24,11 +24,12 @@ class AuthController extends Controller {
             
             if ($user && password_verify($password, $user['password'])) {
                 $_SESSION['user'] = [
-                    'id' => $user['id'],
+                    'id'       => $user['id'],
                     'username' => $user['usuario'],
-                    'nombre' => $user['nombre'],
-                    'rol' => $user['rol'],
-                    'logged_in' => true
+                    'nombre'   => $user['nombre'],
+                    'cargo'    => $user['cargo'] ?? '',
+                    'rol'      => $user['rol'],
+                    'logged_in'=> true
                 ];
                 
                 $this->redirect('novedades/crear');

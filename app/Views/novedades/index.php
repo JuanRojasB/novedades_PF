@@ -130,6 +130,17 @@
     </div>
 </main>
 
+<!-- Modal para ver detalle de novedad -->
+<div id="modal-detalle" class="modal">
+    <div class="modal-content" style="max-width:700px;">
+        <div class="modal-header">
+            <h3>Detalle de Novedad</h3>
+            <button class="modal-close" onclick="cerrarModalDetalle()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-detalle-body"></div>
+    </div>
+</div>
+
 <!-- Modal para ver archivos -->
 <div id="modal-archivos" class="modal">
     <div class="modal-content">
@@ -264,8 +275,38 @@
 const novedadesData = <?php echo json_encode($novedades); ?>;
 
 function verDetalle(id) {
-    alert('Funcionalidad de detalle en desarrollo. ID: ' + id);
+    const novedad = novedadesData.find(n => n.id == id);
+    if (!novedad) return;
+    
+    const body = document.getElementById('modal-detalle-body');
+    body.innerHTML = `
+        <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;width:40%;border:1px solid #e2e8f0;">Empleado</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.nombres_apellidos}</td></tr>
+            <tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Cédula</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.numero_cedula}</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Sede</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.sede}</td></tr>
+            ${novedad.zona_geografica ? `<tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Zona</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.zona_geografica}</td></tr>` : ''}
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Área</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.area_trabajo}</td></tr>
+            <tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Fecha Novedad</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.fecha_novedad}</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Turno</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.turno}</td></tr>
+            <tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Novedad</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.novedad}</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Justificación</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.justificacion === 'SI' ? '<span style="color:#15803d;font-weight:600;">SI</span>' : '<span style="color:#dc2626;font-weight:600;">NO</span>'}</td></tr>
+            <tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Descuento Dominical</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.descontar_dominical}</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Observación</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.observacion_novedad}</td></tr>
+            ${novedad.nota ? `<tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Nota</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.nota}</td></tr>` : ''}
+            <tr style="background:#f8fafc;"><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Responsable</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.responsable}</td></tr>
+            <tr><td style="padding:0.6rem 1rem;font-weight:600;border:1px solid #e2e8f0;">Registrado</td><td style="padding:0.6rem 1rem;border:1px solid #e2e8f0;">${novedad.created_at}</td></tr>
+        </table>
+    `;
+    document.getElementById('modal-detalle').classList.add('active');
 }
+
+function cerrarModalDetalle() {
+    document.getElementById('modal-detalle').classList.remove('active');
+}
+
+document.getElementById('modal-detalle').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalDetalle();
+});
 
 function verArchivos(id) {
     const novedad = novedadesData.find(n => n.id == id);

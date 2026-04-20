@@ -1,6 +1,5 @@
 // Formulario Dinámico - Carga de Áreas según Sede
-
-const BASE_URL = window.location.origin + '/informe-novedades/public';
+// BASE_URL is injected by PHP in the view that includes this script
 
 // Cargar áreas directamente por sede (simplificado)
 async function cargarAreasPorSede() {
@@ -23,7 +22,7 @@ async function cargarAreasPorSede() {
     }
     
     try {
-        const response = await fetch(`${BASE_URL}/api/areas/sede/${sedeId}`);
+        const response = await fetch(`${window.APP_BASE_URL}/api/areas/sede/${sedeId}`);
         const areas = await response.json();
         
         areaSelect.innerHTML = '<option value="">Selecciona el área</option>';

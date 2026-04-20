@@ -60,9 +60,13 @@ class AreaTrabajo {
         return $stmt->fetch();
     }
     
-    public function create($nombre) {
-        $stmt = $this->db->prepare("INSERT INTO areas_trabajo (nombre) VALUES (:nombre)");
-        return $stmt->execute([':nombre' => $nombre]);
+    public function create($nombre, $sede_id = null, $zona_geografica_id = null) {
+        $stmt = $this->db->prepare("INSERT INTO areas_trabajo (nombre, sede_id, zona_geografica_id) VALUES (:nombre, :sede_id, :zona_geografica_id)");
+        return $stmt->execute([
+            ':nombre'             => $nombre,
+            ':sede_id'            => $sede_id,
+            ':zona_geografica_id' => $zona_geografica_id
+        ]);
     }
     
     public function update($id, $nombre, $activo = 1) {

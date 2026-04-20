@@ -45,7 +45,7 @@ function eliminarSede(id) {
     if (confirm('¿Estás seguro de eliminar esta sede?')) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = BASE_URL + '/admin/eliminarSede';
+        form.action = window.APP_BASE_URL + '/admin/eliminarSede';
         
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -70,7 +70,7 @@ function eliminarArea(id) {
     if (confirm('¿Estás seguro de eliminar esta área?')) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = BASE_URL + '/admin/eliminarArea';
+        form.action = window.APP_BASE_URL + '/admin/eliminarArea';
         
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -95,7 +95,7 @@ function eliminarTipo(id) {
     if (confirm('¿Estás seguro de eliminar este tipo de novedad?')) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = BASE_URL + '/admin/eliminarTipoNovedad';
+        form.action = window.APP_BASE_URL + '/admin/eliminarTipoNovedad';
         
         const input = document.createElement('input');
         input.type = 'hidden';
