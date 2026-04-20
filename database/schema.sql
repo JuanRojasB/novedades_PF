@@ -200,14 +200,14 @@ CREATE TABLE IF NOT EXISTS novedades (
     INDEX idx_cedula (numero_cedula)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla de archivos adjuntos (almacenados en BD)
+-- Tabla de archivos adjuntos (almacenados en filesystem)
 CREATE TABLE IF NOT EXISTS archivos_adjuntos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     novedad_id INT NOT NULL,
     nombre_archivo VARCHAR(255) NOT NULL,
     tipo_mime VARCHAR(100) NOT NULL,
     tamanio INT NOT NULL,
-    contenido MEDIUMBLOB NOT NULL,
+    ruta_archivo VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (novedad_id) REFERENCES novedades(id) ON DELETE CASCADE,
     INDEX idx_novedad (novedad_id)

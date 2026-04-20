@@ -42,59 +42,65 @@ class ApiController extends Controller {
         exit;
     }
     
-    // Servir archivo desde BD (para visualizar en navegador)
+    // Servir archivo desde disco (para visualizar en navegador)
     public function servirArchivo($archivo_id) {
         $archivoModel = new \Models\ArchivoAdjunto();
         $archivo = $archivoModel->getById($archivo_id);
-        
+
         if (!$archivo) {
             http_response_code(404);
             echo "Archivo no encontrado";
             exit;
         }
-        
-        // Limpiar buffer de salida
-        if (ob_get_level()) {
-            ob_end_clean();
+
+        $ruta = $archivoModel->getRutaFisica($archivo['ruta_archivo']);
+
+        if (!file_exists($ruta)) {
+            http_response_code(404);
+            echo "Archivo no encontrado en disco";
+            exit;
         }
-        
-        // Configurar headers (inline para visualizar en navegador)
+
+        if (ob_get_level()) ob_end_clean();
+
         header('Content-Type: ' . $archivo['tipo_mime']);
         header('Content-Disposition: inline; filename="' . $archivo['nombre_archivo'] . '"');
-        header('Content-Length: ' . $archivo['tamanio']);
+        header('Content-Length: ' . filesize($ruta));
         header('Cache-Control: public, max-age=3600');
-        
-        // Enviar archivo
-        echo $archivo['contenido'];
+
+        readfile($ruta);
         exit;
     }
-    
-    // Descargar archivo desde BD
+
+    // Descargar archivo desde disco
     public function descargarArchivo($archivo_id) {
         $archivoModel = new \Models\ArchivoAdjunto();
         $archivo = $archivoModel->getById($archivo_id);
-        
+
         if (!$archivo) {
             http_response_code(404);
             echo "Archivo no encontrado";
             exit;
         }
-        
-        // Limpiar buffer de salida
-        if (ob_get_level()) {
-            ob_end_clean();
+
+        $ruta = $archivoModel->getRutaFisica($archivo['ruta_archivo']);
+
+        if (!file_exists($ruta)) {
+            http_response_code(404);
+            echo "Archivo no encontrado en disco";
+            exit;
         }
-        
-        // Configurar headers (attachment para forzar descarga)
+
+        if (ob_get_level()) ob_end_clean();
+
         header('Content-Type: ' . $archivo['tipo_mime']);
         header('Content-Disposition: attachment; filename="' . $archivo['nombre_archivo'] . '"');
-        header('Content-Length: ' . $archivo['tamanio']);
+        header('Content-Length: ' . filesize($ruta));
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header('Expires: 0');
-        
-        // Enviar archivo
-        echo $archivo['contenido'];
+
+        readfile($ruta);
         exit;
     }
     

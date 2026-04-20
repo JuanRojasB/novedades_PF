@@ -130,47 +130,42 @@ class NovedadController extends Controller {
         $user = $this->getUser();
         $datos['responsable'] = $user['nombre'];
         
-        // Procesar archivos y guardarlos en la BD
+        // Procesar archivos — guardar en filesystem
         $archivos_temp = [];
         if (isset($_FILES['archivos']) && !empty($_FILES['archivos']['name'][0])) {
-            $max_files = 3;
-            $max_size = 10 * 1024 * 1024; // 10MB
+            $max_files    = 3;
+            $max_size     = 10 * 1024 * 1024; // 10MB
             $allowed_types = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif'];
-            
+
             $total_archivos = count($_FILES['archivos']['name']);
-            
+
             if ($total_archivos > $max_files) {
                 $errores[] = "Solo se permiten hasta $max_files archivos.";
             } else {
                 for ($i = 0; $i < $total_archivos; $i++) {
                     $nombre_archivo = $_FILES['archivos']['name'][$i];
                     $tamaño_archivo = $_FILES['archivos']['size'][$i];
-                    $tmp_archivo = $_FILES['archivos']['tmp_name'][$i];
-                    $tipo_mime = $_FILES['archivos']['type'][$i];
-                    $extension = strtolower(pathinfo($nombre_archivo, PATHINFO_EXTENSION));
-                    
+                    $tmp_archivo    = $_FILES['archivos']['tmp_name'][$i];
+                    $tipo_mime      = $_FILES['archivos']['type'][$i];
+                    $extension      = strtolower(pathinfo($nombre_archivo, PATHINFO_EXTENSION));
+
+                    if (empty($nombre_archivo) || empty($tmp_archivo)) continue;
+
                     if ($tamaño_archivo > $max_size) {
                         $errores[] = "El archivo '$nombre_archivo' excede el tamaño máximo de 10MB.";
                         continue;
                     }
-                    
+
                     if (!in_array($extension, $allowed_types)) {
                         $errores[] = "El archivo '$nombre_archivo' no es válido. Solo se permiten: PDF, Word, Imágenes.";
                         continue;
                     }
-                    
-                    // Leer el contenido del archivo
-                    $contenido = file_get_contents($tmp_archivo);
-                    
-                    if ($contenido !== false) {
-                        $archivos_temp[] = [
-                            'nombre' => $nombre_archivo,
-                            'tipo_mime' => $tipo_mime,
-                            'contenido' => $contenido
-                        ];
-                    } else {
-                        $errores[] = "Error al leer el archivo '$nombre_archivo'.";
-                    }
+
+                    $archivos_temp[] = [
+                        'nombre'    => $nombre_archivo,
+                        'tipo_mime' => $tipo_mime,
+                        'tmp_path'  => $tmp_archivo,   // ruta temporal, no contenido
+                    ];
                 }
             }
         }
@@ -180,7 +175,7 @@ class NovedadController extends Controller {
             $novedad_id = $novedadModel->create($datos);
             
             if ($novedad_id) {
-                // Guardar archivos en la BD
+                // Guardar archivos en filesystem
                 if (!empty($archivos_temp)) {
                     $archivoModel = new \Models\ArchivoAdjunto();
                     foreach ($archivos_temp as $archivo) {
@@ -188,7 +183,8 @@ class NovedadController extends Controller {
                             $novedad_id,
                             $archivo['nombre'],
                             $archivo['tipo_mime'],
-                            $archivo['contenido']
+                            $archivo['tmp_path'],
+                            true   // es ruta temporal
                         );
                     }
                 }
