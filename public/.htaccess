@@ -1,0 +1,14 @@
+# public/.htaccess - Configuración para Apache
+
+RewriteEngine On
+
+# Redirigir todo a index.php excepto archivos existentes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Prevenir acceso a archivos sensibles
+<FilesMatch "\.(env|json|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
