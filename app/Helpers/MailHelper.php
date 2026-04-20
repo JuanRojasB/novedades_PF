@@ -138,6 +138,9 @@ class MailHelper {
      * Plantilla HTML del correo de novedad
      */
     private function plantillaNovedad(array $n): string {
+        $config = require CONFIG_PATH . '/config.php';
+        $urlSistema = $config['app']['url'];
+        
         $fecha = date('d/m/Y', strtotime($n['fecha_novedad']));
         $just  = $n['justificacion'] === 'SI'
             ? '<span style="color:#15803d;font-weight:600;">SI</span>'
@@ -154,9 +157,9 @@ class MailHelper {
 
         <!-- Header -->
         <tr>
-          <td style="background:#3b82f6;padding:1.5rem 2rem;">
-            <h1 style="margin:0;color:#ffffff;font-size:1.25rem;">Sistema de Novedades</h1>
-            <p style="margin:0.25rem 0 0;color:#bfdbfe;font-size:0.875rem;">Pollo Fiesta</p>
+          <td style="background:linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);padding:1.5rem 2rem;">
+            <h1 style="margin:0;color:#ffffff;font-size:1.25rem;">Nueva Novedad Registrada</h1>
+            <p style="margin:0.25rem 0 0;color:#bfdbfe;font-size:0.875rem;">Sistema de Novedades - Pollo Fiesta</p>
           </td>
         </tr>
 
@@ -211,6 +214,24 @@ class MailHelper {
                 <td style="border:1px solid #e2e8f0;color:#1e293b;">{$n['responsable']}</td>
               </tr>
             </table>
+
+            <!-- Botón de acceso -->
+            <div style="margin:2rem 0 1rem;text-align:center;">
+              <a href="{$urlSistema}" 
+                 style="display:inline-block;background:#3b82f6;color:#ffffff;padding:0.875rem 2rem;text-decoration:none;border-radius:8px;font-weight:600;font-size:0.95rem;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                Ingresar al Sistema
+              </a>
+            </div>
+
+            <!-- Credenciales -->
+            <div style="background:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin-top:1.5rem;border-radius:4px;">
+              <p style="margin:0 0 0.5rem;color:#1e40af;font-weight:600;font-size:0.875rem;">Acceso al Sistema:</p>
+              <p style="margin:0;color:#475569;font-size:0.85rem;">
+                <strong>URL:</strong> <a href="{$urlSistema}" style="color:#3b82f6;text-decoration:none;">{$urlSistema}</a><br>
+                <strong>Usuario:</strong> Su usuario asignado<br>
+                <strong>Contraseña:</strong> Su contraseña asignada
+              </p>
+            </div>
           </td>
         </tr>
 
