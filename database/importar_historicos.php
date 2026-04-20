@@ -6,6 +6,8 @@
 
 define('ROOT_PATH', dirname(__DIR__));
 define('CONFIG_PATH', ROOT_PATH . '/config');
+define('STORAGE_PATH', ROOT_PATH . '/storage');
+define('APP_PATH',     ROOT_PATH . '/app');
 
 $config = require CONFIG_PATH . '/config.php';
 $db_cfg = $config['database'];
