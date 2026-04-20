@@ -32,11 +32,6 @@
                     <button type="submit" class="primary-button">Iniciar Sesión</button>
                 </div>
             </form>
-            
-            <div class="auth-footer" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; text-align: center;">
-                <p style="font-size: 0.8rem; color: #64748b; margin: 0 0 0.5rem;">Credenciales de acceso:</p>
-                <p style="font-size: 0.85rem; color: #475569; margin: 0;"><strong>Usuario:</strong> usuario | <strong>Contraseña:</strong> 123456</p>
-            </div>
         </div>
     </div>
 </div>

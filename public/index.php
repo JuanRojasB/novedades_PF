@@ -41,6 +41,7 @@ $routes = [
     'novedades/crear' => ['controller' => 'Controllers\NovedadController', 'method' => 'crear'],
     'novedades/guardar' => ['controller' => 'Controllers\NovedadController', 'method' => 'guardar'],
     'novedades' => ['controller' => 'Controllers\NovedadController', 'method' => 'index'],
+    'estadisticas' => ['controller' => 'Controllers\NovedadController', 'method' => 'estadisticas'],
     'admin' => ['controller' => 'Controllers\AdminController', 'method' => 'index'],
     'admin/crearSede' => ['controller' => 'Controllers\AdminController', 'method' => 'crearSede'],
     'admin/actualizarSede' => ['controller' => 'Controllers\AdminController', 'method' => 'actualizarSede'],

@@ -57,8 +57,8 @@
     </div>
 
 
-    <!-- Estadísticas -->
-    <?php if (!empty($estadisticas)): ?>
+    <!-- Estadísticas (solo para admin) -->
+    <?php if ($user['rol'] === 'admin' && !empty($estadisticas)): ?>
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-value"><?php echo count($novedades); ?></div>
@@ -114,14 +114,11 @@
                         <td><?php echo htmlspecialchars($novedad['responsable']); ?></td>
                         <td>
                             <button class="btn-icon" onclick="verDetalle(<?php echo $novedad['id']; ?>)" title="Ver detalle">
-                                👁️
+                                Ver
                             </button>
-                            <?php 
-                            $archivos = json_decode($novedad['archivos_adjuntos'], true);
-                            if (!empty($archivos)): 
-                            ?>
+                            <?php if ($novedad['total_archivos'] > 0): ?>
                                 <button class="btn-icon" onclick="verArchivos(<?php echo $novedad['id']; ?>)" title="Ver archivos">
-                                    📎
+                                    Descargar
                                 </button>
                             <?php endif; ?>
                         </td>

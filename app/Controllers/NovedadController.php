@@ -215,4 +215,38 @@ class NovedadController extends Controller {
             $this->redirect('novedades/crear');
         }
     }
+    
+    public function estadisticas() {
+        $this->requireAuth();
+        $user = $this->getUser();
+        
+        // Solo admin puede ver estadísticas
+        if ($user['rol'] !== 'admin') {
+            $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
+            $this->redirect('novedades');
+        }
+        
+        $novedadModel = new Novedad();
+        
+        // Obtener estadísticas generales
+        $stats = [
+            'total_novedades' => $novedadModel->getTotalNovedades(),
+            'por_sede' => $novedadModel->getNovedadesPorSede(),
+            'por_tipo' => $novedadModel->getNovedadesPorTipo(),
+            'por_justificacion' => $novedadModel->getNovedadesPorJustificacion(),
+            'por_area' => $novedadModel->getEstadisticasPorZona(),
+            'por_turno' => $novedadModel->getNovedadesPorTurno(),
+            'descontar_dominical' => $novedadModel->getNovedadesDescontarDominical(),
+            'por_mes' => $novedadModel->getNovedadesPorMes(),
+            'top_responsables' => $novedadModel->getTopResponsables()
+        ];
+        
+        $data = [
+            'title' => 'Estadísticas y Gráficos',
+            'user' => $user,
+            'stats' => $stats
+        ];
+        
+        $this->view('novedades/estadisticas', $data);
+    }
 }

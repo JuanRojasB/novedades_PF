@@ -156,6 +156,14 @@ class Novedad {
         return $stmt->fetchAll();
     }
     
+    // Obtener total de novedades
+    public function getTotalNovedades() {
+        $sql = "SELECT COUNT(*) as total FROM novedades";
+        $stmt = $this->db->query($sql);
+        $result = $stmt->fetch();
+        return $result['total'];
+    }
+    
     // Obtener novedades por sede
     public function getNovedadesPorSede() {
         $sql = "SELECT 
@@ -164,6 +172,83 @@ class Novedad {
         FROM novedades
         GROUP BY sede
         ORDER BY total DESC";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener novedades por tipo
+    public function getNovedadesPorTipo() {
+        $sql = "SELECT 
+            novedad as tipo,
+            COUNT(*) as total
+        FROM novedades
+        GROUP BY novedad
+        ORDER BY total DESC";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener novedades por justificación
+    public function getNovedadesPorJustificacion() {
+        $sql = "SELECT 
+            justificacion,
+            COUNT(*) as total
+        FROM novedades
+        GROUP BY justificacion";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener novedades por turno
+    public function getNovedadesPorTurno() {
+        $sql = "SELECT 
+            turno,
+            COUNT(*) as total
+        FROM novedades
+        GROUP BY turno";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener novedades con descuento dominical
+    public function getNovedadesDescontarDominical() {
+        $sql = "SELECT 
+            descontar_dominical,
+            COUNT(*) as total
+        FROM novedades
+        GROUP BY descontar_dominical";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener novedades por mes
+    public function getNovedadesPorMes() {
+        $sql = "SELECT 
+            DATE_FORMAT(fecha_novedad, '%Y-%m') as mes,
+            COUNT(*) as total
+        FROM novedades
+        GROUP BY mes
+        ORDER BY mes DESC
+        LIMIT 12";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener top responsables
+    public function getTopResponsables() {
+        $sql = "SELECT 
+            responsable,
+            COUNT(*) as total
+        FROM novedades
+        GROUP BY responsable
+        ORDER BY total DESC
+        LIMIT 10";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
