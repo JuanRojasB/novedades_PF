@@ -63,7 +63,7 @@ class NovedadController extends Controller {
             'estadisticas' => $estadisticas,
             'filters' => $filters,
             'sedes' => $sedesDisponibles,
-            'areas' => $areaModel->getAll()
+            'areas' => $areaModel->getAllUnique() // Usar método que trae áreas únicas
         ];
         
         $this->view('novedades/index', $data);
