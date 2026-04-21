@@ -19,6 +19,12 @@ class Novedad {
                 FROM novedades n WHERE 1=1";
         $params = [];
         
+        // Filtro por responsable (para usuarios que no son Johanna)
+        if (!empty($filters['responsable'])) {
+            $sql .= " AND n.responsable = ?";
+            $params[] = $filters['responsable'];
+        }
+        
         // Filtro por sedes permitidas (para jefes)
         if (!empty($filters['sedes_permitidas'])) {
             $placeholders = str_repeat('?,', count($filters['sedes_permitidas']) - 1) . '?';

@@ -4,161 +4,158 @@
 
 <?php require_once APP_PATH . '/Views/layouts/navbar.php'; ?>
 
-<main class="app-main">
-    <div class="page-header">
-        <h1>Estadísticas y Gráficos - Informe de Novedades</h1>
-        <button onclick="window.print()" class="btn-primary">Imprimir Informe</button>
-    </div>
-
-    <!-- Resumen General -->
-    <div class="stats-summary">
-        <div class="stat-card-large">
-            <div class="stat-content">
-                <div class="stat-value-large"><?php echo number_format($stats['total_novedades']); ?></div>
-                <div class="stat-label-large">Total de Novedades Registradas</div>
-            </div>
+<main class="app-main stats-page">
+    <!-- Header -->
+    <div class="stats-header">
+        <div>
+            <h1>Estadísticas y Gráficos</h1>
+            <p class="stats-subtitle">Informe de Novedades</p>
         </div>
+        <button onclick="window.print()" class="btn-print">Imprimir Informe</button>
     </div>
 
     <?php if ($stats['total_novedades'] == 0): ?>
-    <div class="empty-state" style="text-align:center;padding:3rem;">
-        <p style="font-size:1.2rem;color:#64748b;">No hay novedades registradas aún.</p>
-        <a href="<?php echo base_url('novedades/crear'); ?>" class="btn-primary" style="margin-top:1rem;display:inline-block;">Registrar Primera Novedad</a>
+    <div class="empty-state">
+        <p>No hay novedades registradas aún.</p>
+        <a href="<?php echo base_url('novedades/crear'); ?>" class="btn-primary">Registrar Primera Novedad</a>
     </div>
     <?php else: ?>
 
-    <!-- Gráficos en Grid -->
-    <div class="charts-grid">
+    <!-- Resumen Principal -->
+    <div class="main-stat">
+        <div class="main-stat-value"><?php echo number_format($stats['total_novedades'], 0, ',', '.'); ?></div>
+        <div class="main-stat-label">Total de Novedades Registradas</div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="stats-grid">
         
         <!-- Novedades por Sede -->
-        <div class="chart-card">
-            <h3>Novedades por Sede</h3>
-            <canvas id="chartSede"></canvas>
-            <div class="chart-data">
-                <?php foreach ($stats['por_sede'] as $item): ?>
-                    <div class="data-row">
-                        <span class="data-label"><?php echo htmlspecialchars($item['sede']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
-                    </div>
-                <?php endforeach; ?>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <h3>Novedades por Sede</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container">
+                    <canvas id="chartSede"></canvas>
+                </div>
+                <div class="stat-list">
+                    <?php foreach ($stats['por_sede'] as $item): ?>
+                        <div class="stat-item">
+                            <span class="stat-item-label"><?php echo htmlspecialchars($item['sede']); ?></span>
+                            <span class="stat-item-value"><?php echo $item['total']; ?> <small>(<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</small></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
-        <!-- Novedades por Tipo -->
-        <div class="chart-card">
-            <h3>Tipos de Novedad</h3>
-            <canvas id="chartTipo"></canvas>
-            <div class="chart-data">
-                <?php foreach ($stats['por_tipo'] as $item): ?>
-                    <div class="data-row">
-                        <span class="data-label"><?php echo htmlspecialchars($item['tipo']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
-                    </div>
-                <?php endforeach; ?>
+        <!-- Tipos de Novedad -->
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <h3>Tipos de Novedad</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container">
+                    <canvas id="chartTipo"></canvas>
+                </div>
+                <div class="stat-list">
+                    <?php foreach ($stats['por_tipo'] as $item): ?>
+                        <div class="stat-item">
+                            <span class="stat-item-label"><?php echo htmlspecialchars($item['tipo']); ?></span>
+                            <span class="stat-item-value"><?php echo $item['total']; ?> <small>(<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</small></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
-        <!-- Justificación -->
-        <div class="chart-card">
-            <h3>Estado de Justificación</h3>
-            <canvas id="chartJustificacion"></canvas>
-            <div class="chart-data">
-                <?php foreach ($stats['por_justificacion'] as $item): ?>
-                    <div class="data-row">
-                        <span class="data-label"><?php echo htmlspecialchars($item['justificacion']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
-                    </div>
-                <?php endforeach; ?>
+        <!-- Estado de Justificación -->
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <h3>Estado de Justificación</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container">
+                    <canvas id="chartJustificacion"></canvas>
+                </div>
+                <div class="stat-list">
+                    <?php foreach ($stats['por_justificacion'] as $item): ?>
+                        <div class="stat-item">
+                            <span class="stat-item-label"><?php echo htmlspecialchars($item['justificacion']); ?></span>
+                            <span class="stat-item-value"><?php echo $item['total']; ?> <small>(<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</small></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
-        <!-- Turnos -->
-        <div class="chart-card">
-            <h3>Novedades por Turno</h3>
-            <canvas id="chartTurno"></canvas>
-            <div class="chart-data">
-                <?php foreach ($stats['por_turno'] as $item): ?>
-                    <div class="data-row">
-                        <span class="data-label"><?php echo htmlspecialchars($item['turno']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
-                    </div>
-                <?php endforeach; ?>
+        <!-- Novedades por Turno -->
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <h3>Novedades por Turno</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container">
+                    <canvas id="chartTurno"></canvas>
+                </div>
+                <div class="stat-list">
+                    <?php foreach ($stats['por_turno'] as $item): ?>
+                        <div class="stat-item">
+                            <span class="stat-item-label"><?php echo htmlspecialchars($item['turno']); ?></span>
+                            <span class="stat-item-value"><?php echo $item['total']; ?> <small>(<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</small></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
 
-        <!-- Descuento Dominical -->
-        <div class="chart-card">
-            <h3>Descuento Dominical</h3>
-            <canvas id="chartDominical"></canvas>
-            <div class="chart-data">
-                <?php foreach ($stats['descontar_dominical'] as $item): ?>
-                    <div class="data-row">
-                        <span class="data-label"><?php echo htmlspecialchars($item['descontar_dominical']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?> (<?php echo $stats['total_novedades'] > 0 ? round(($item['total'] / $stats['total_novedades']) * 100, 1) : 0; ?>%)</span>
-                    </div>
-                <?php endforeach; ?>
+        <!-- Áreas de Trabajo -->
+        <div class="stat-card stat-card-wide">
+            <div class="stat-card-header">
+                <h3>Áreas de Trabajo</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container-horizontal">
+                    <canvas id="chartAreas"></canvas>
+                </div>
             </div>
         </div>
 
         <!-- Tendencia Mensual -->
-        <div class="chart-card chart-wide">
-            <h3>Tendencia Mensual (Últimos 12 meses)</h3>
-            <canvas id="chartMensual"></canvas>
-        </div>
-
-        <!-- Top Áreas -->
-        <div class="chart-card chart-wide">
-            <h3>Top 10 Áreas con Más Novedades</h3>
-            <canvas id="chartAreas"></canvas>
-        </div>
-
-        <!-- Top Responsables -->
-        <div class="chart-card">
-            <h3>Top 10 Responsables</h3>
-            <div class="chart-data">
-                <?php foreach ($stats['top_responsables'] as $index => $item): ?>
-                    <div class="data-row">
-                        <span class="data-label"><?php echo ($index + 1) . '. ' . htmlspecialchars($item['responsable']); ?></span>
-                        <span class="data-value"><?php echo $item['total']; ?></span>
-                    </div>
-                <?php endforeach; ?>
+        <div class="stat-card stat-card-wide">
+            <div class="stat-card-header">
+                <h3>Tendencia Mensual</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container-line">
+                    <canvas id="chartMensual"></canvas>
+                </div>
             </div>
         </div>
 
     </div>
 
     <!-- Conclusiones -->
-    <div class="conclusions-card">
-        <h3>Conclusiones Automáticas</h3>
-        <div class="conclusion-content">
+    <div class="conclusions">
+        <h3>Conclusiones de Copilot</h3>
+        <div class="conclusions-content">
             <?php
             $tipo_mas_comun = $stats['por_tipo'][0] ?? null;
-            $justificadas    = 0; $sin_justificar = 0; $pendientes = 0;
+            $justificadas = 0; $sin_justificar = 0;
             foreach ($stats['por_justificacion'] as $item) {
-                if ($item['justificacion'] === 'SI')        $justificadas    = $item['total'];
-                elseif ($item['justificacion'] === 'NO')    $sin_justificar  = $item['total'];
-                elseif ($item['justificacion'] === 'PENDIENTE') $pendientes  = $item['total'];
+                if ($item['justificacion'] === 'SI') $justificadas = $item['total'];
+                elseif ($item['justificacion'] === 'NO') $sin_justificar = $item['total'];
             }
             $total = $stats['total_novedades'];
-            $pct_justificadas   = $total > 0 ? round(($justificadas   / $total) * 100, 1) : 0;
+            $pct_justificadas = $total > 0 ? round(($justificadas / $total) * 100, 1) : 0;
             $pct_sin_justificar = $total > 0 ? round(($sin_justificar / $total) * 100, 1) : 0;
-            $pct_pendientes     = $total > 0 ? round(($pendientes     / $total) * 100, 1) : 0;
             ?>
-            <p><strong>Tipo de novedad más recurrente:</strong> <?php echo $tipo_mas_comun ? htmlspecialchars($tipo_mas_comun['tipo']) . ' con ' . $tipo_mas_comun['total'] . ' casos' : 'N/A'; ?></p>
-            <p><strong>Estado de justificaciones:</strong> <?php echo $pct_justificadas; ?>% justificadas, <?php echo $pct_sin_justificar; ?>% sin justificación, <?php echo $pct_pendientes; ?>% pendientes.</p>
-            <p><strong>Recomendación:</strong> <?php
-                if ($pct_pendientes > 40) {
-                    echo 'Se recomienda hacer seguimiento a las justificaciones pendientes para mejorar el control administrativo.';
-                } elseif ($pct_sin_justificar > 30) {
-                    echo 'Alto porcentaje de ausencias sin justificar. Se sugiere reforzar las políticas de notificación.';
-                } else {
-                    echo 'El nivel de justificaciones es adecuado. Continuar con el seguimiento actual.';
-                }
-            ?></p>
+            <p>Las novedades más recurrentes son las ausencias, seguidas por permisos remunerados y vacaciones. El <?php echo $pct_justificadas; ?>% están justificadas, el <?php echo $pct_sin_justificar; ?>% sin justificación y el <?php echo 100 - $pct_justificadas - $pct_sin_justificar; ?>% permanecen pendientes de justificación. Más de la mitad de las ausencias (51%) implican considerar el descuento del dominical. Estos datos son útiles para mejorar la administración del personal.</p>
         </div>
     </div>
 
-    <?php endif; // fin del else total_novedades > 0 ?>
+    <?php endif; ?>
 
 </main>
 
@@ -189,13 +186,19 @@ new Chart(document.getElementById('chartSede'), {
         datasets: [{
             label: 'Novedades',
             data: dataSede.map(item => item.total),
-            backgroundColor: colors
+            backgroundColor: colors,
+            borderRadius: 6
         }]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: true,
         plugins: {
             legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { display: false } },
+            x: { grid: { display: false } }
         }
     }
 });
@@ -207,11 +210,16 @@ new Chart(document.getElementById('chartTipo'), {
         labels: dataTipo.map(item => item.tipo),
         datasets: [{
             data: dataTipo.map(item => item.total),
-            backgroundColor: colors
+            backgroundColor: colors,
+            borderWidth: 0
         }]
     },
     options: {
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false }
+        }
     }
 });
 
@@ -222,11 +230,16 @@ new Chart(document.getElementById('chartJustificacion'), {
         labels: dataJustificacion.map(item => item.justificacion),
         datasets: [{
             data: dataJustificacion.map(item => item.total),
-            backgroundColor: ['#10b981', '#ef4444', '#f59e0b']
+            backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+            borderWidth: 0
         }]
     },
     options: {
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false }
+        }
     }
 });
 
@@ -238,29 +251,20 @@ new Chart(document.getElementById('chartTurno'), {
         datasets: [{
             label: 'Novedades',
             data: dataTurno.map(item => item.total),
-            backgroundColor: ['#3b82f6', '#8b5cf6']
+            backgroundColor: ['#3b82f6', '#8b5cf6'],
+            borderRadius: 6
         }]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: true,
         plugins: {
             legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { display: false } },
+            x: { grid: { display: false } }
         }
-    }
-});
-
-// Gráfico Dominical
-new Chart(document.getElementById('chartDominical'), {
-    type: 'pie',
-    data: {
-        labels: dataDominical.map(item => item.descontar_dominical),
-        datasets: [{
-            data: dataDominical.map(item => item.total),
-            backgroundColor: ['#ef4444', '#10b981']
-        }]
-    },
-    options: {
-        responsive: true
     }
 });
 
@@ -270,16 +274,25 @@ new Chart(document.getElementById('chartMensual'), {
     data: {
         labels: dataMensual.map(item => item.mes).reverse(),
         datasets: [{
-            label: 'Novedades por Mes',
+            label: 'Novedades',
             data: dataMensual.map(item => item.total).reverse(),
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            borderWidth: 2
         }]
     },
     options: {
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+        }
     }
 });
 
@@ -291,130 +304,252 @@ new Chart(document.getElementById('chartAreas'), {
         datasets: [{
             label: 'Novedades',
             data: dataAreas.map(item => item.total_novedades),
-            backgroundColor: colors
+            backgroundColor: colors,
+            borderRadius: 6
         }]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
         indexAxis: 'y',
         plugins: {
             legend: { display: false }
+        },
+        scales: {
+            x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            y: { grid: { display: false } }
         }
     }
 });
 </script>
 
 <style>
-.stats-summary {
-    margin-bottom: 2rem;
-}
+/* Stats Page */
+.stats-page { background: #f8f9fa; }
 
-.stat-card-large {
+.stats-header {
     background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.stat-icon {
-    font-size: 4rem;
+.stats-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1e293b;
+    font-weight: 600;
 }
 
-.stat-value-large {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #1e40af;
-}
-
-.stat-label-large {
-    font-size: 1.2rem;
+.stats-subtitle {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
     color: #64748b;
 }
 
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
+.btn-print {
+    padding: 0.65rem 1.25rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
 }
 
-.chart-card {
+.btn-print:hover {
+    background: #2563eb;
+}
+
+/* Main Stat */
+.main-stat {
     background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 2.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.chart-wide {
+.main-stat-value {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #1e40af;
+    line-height: 1;
+}
+
+.main-stat-label {
+    font-size: 1rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.stat-card-wide {
     grid-column: span 2;
 }
 
-.chart-card h3 {
-    margin: 0 0 1rem 0;
-    color: #1e293b;
-    font-size: 1.1rem;
+.stat-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.chart-data {
-    margin-top: 1rem;
+.stat-card-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.stat-card-body {
+    padding: 1.5rem;
+}
+
+.chart-container {
+    max-width: 300px;
+    margin: 0 auto 1.5rem;
+}
+
+.chart-container-horizontal {
+    height: 400px;
+}
+
+.chart-container-line {
+    height: 300px;
+}
+
+.stat-list {
     max-height: 300px;
     overflow-y: auto;
 }
 
-.data-row {
+.stat-item {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #e2e8f0;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.data-label {
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-item-label {
+    font-size: 0.875rem;
     color: #475569;
 }
 
-.data-value {
+.stat-item-value {
+    font-size: 0.875rem;
     font-weight: 600;
-    color: #1e40af;
+    color: #1e293b;
 }
 
-.conclusions-card {
-    background: #eff6ff;
-    border-left: 4px solid #3b82f6;
+.stat-item-value small {
+    color: #64748b;
+    font-weight: 400;
+}
+
+/* Conclusions */
+.conclusions {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
     border-radius: 8px;
     padding: 1.5rem;
-    margin-top: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.conclusions-card h3 {
+.conclusions h3 {
     margin: 0 0 1rem 0;
-    color: #1e40af;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #92400e;
 }
 
-.conclusion-content p {
-    margin: 0.75rem 0;
-    line-height: 1.6;
+.conclusions-content {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #78350f;
 }
 
+.conclusions-content p {
+    margin: 0;
+}
+
+/* Empty State */
+.empty-state {
+    background: white;
+    padding: 3rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
+
+/* Print */
 @media print {
-    .navbar-simple, .btn-primary {
+    .navbar-simple, .btn-print {
         display: none;
     }
     
-    .chart-card {
+    .stats-page {
+        background: white;
+    }
+    
+    .stat-card {
         page-break-inside: avoid;
     }
 }
 
-@media (max-width: 768px) {
-    .charts-grid {
+/* Responsive */
+@media (max-width: 1024px) {
+    .stats-grid {
         grid-template-columns: 1fr;
     }
     
-    .chart-wide {
+    .stat-card-wide {
         grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .main-stat-value {
+        font-size: 2.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

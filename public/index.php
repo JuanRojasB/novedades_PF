@@ -1,6 +1,10 @@
 <?php
 // public/index.php - Punto de entrada único de la aplicación
 
+// Desactivar errores en producción (activar solo para debugging)
+error_reporting(0);
+ini_set('display_errors', 0);
+
 session_start();
 
 // Definir constantes

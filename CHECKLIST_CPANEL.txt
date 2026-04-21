@@ -1,0 +1,115 @@
+╔══════════════════════════════════════════════════════════════╗
+║  CHECKLIST RÁPIDO - INSTALACIÓN EN CPANEL                   ║
+╚══════════════════════════════════════════════════════════════╝
+
+📦 ANTES DE SUBIR:
+  [ ] Desactivar errores PHP (ya hecho en public/index.php)
+  [ ] Comprimir proyecto en ZIP
+  [ ] Tener acceso a cPanel
+
+🗄️ BASE DE DATOS:
+  [ ] Crear base de datos en cPanel → MySQL Databases
+  [ ] Crear usuario de BD
+  [ ] Asignar usuario a BD (ALL PRIVILEGES)
+  [ ] Anotar: host, database, username, password
+  [ ] Ir a phpMyAdmin
+  [ ] Importar: database/schema.sql
+  [ ] Ejecutar: database/EJECUTAR_EN_CPANEL.sql
+
+📁 SUBIR ARCHIVOS:
+  [ ] Ir a File Manager en cPanel
+  [ ] Navegar a public_html (o tu directorio)
+  [ ] Upload del archivo ZIP
+  [ ] Extract del archivo ZIP
+  [ ] Verificar que se creó la estructura de carpetas
+
+⚙️ CONFIGURAR:
+  [ ] Editar config/config.php:
+      - Cambiar 'url' por tu dominio
+      - Actualizar 'database' con datos de cPanel
+      - Actualizar 'mail' con tu servidor de correo
+  
+  [ ] Configurar permisos:
+      - storage/uploads/ → 755 o 777
+      - .htaccess → 644
+
+🔒 SEGURIDAD:
+  [ ] Cambiar contraseña de usuario 'admin' en BD
+  [ ] Verificar que .htaccess protege /app/, /config/, /database/
+  [ ] Activar SSL/HTTPS en cPanel
+  [ ] Configurar backups automáticos
+
+✅ PROBAR:
+  [ ] Acceder a https://tudominio.com/
+  [ ] Login funciona
+  [ ] Crear novedad funciona
+  [ ] Subir archivos funciona
+  [ ] Ver novedades funciona
+  [ ] Estadísticas funciona (usuario Johanna)
+
+📧 CORREO (OPCIONAL):
+  [ ] Crear cuenta de correo en cPanel
+  [ ] Actualizar config/config.php con credenciales
+  [ ] Probar envío de correo
+
+🎯 OPTIMIZACIONES (OPCIONAL):
+  [ ] Activar OPcache en Select PHP Version
+  [ ] Aumentar límites PHP:
+      - upload_max_filesize: 100M
+      - post_max_size: 100M
+      - memory_limit: 256M
+
+═══════════════════════════════════════════════════════════════
+
+📝 DATOS A ANOTAR:
+
+URL del sitio: _________________________________
+
+Base de Datos:
+  Host:     localhost
+  Database: _________________________________
+  Username: _________________________________
+  Password: _________________________________
+
+Usuario Admin:
+  Usuario:  admin
+  Password: _________________________________ (CAMBIAR!)
+
+Correo SMTP:
+  Host:     _________________________________
+  Port:     465 (SSL) o 587 (TLS)
+  Email:    _________________________________
+  Password: _________________________________
+
+═══════════════════════════════════════════════════════════════
+
+🆘 SI HAY PROBLEMAS:
+
+Error 500:
+  → Revisar permisos de storage/uploads/
+  → Revisar .htaccess
+  → Ver Error Log en cPanel
+
+No conecta a BD:
+  → Verificar credenciales en config/config.php
+  → Verificar prefijo de cPanel en nombres
+
+No suben archivos:
+  → Permisos de storage/uploads/ en 777
+  → Aumentar upload_max_filesize en PHP
+
+═══════════════════════════════════════════════════════════════
+
+✨ ARCHIVOS IMPORTANTES CREADOS:
+
+  ✓ .htaccess (raíz) - Redirige a public/
+  ✓ public/.htaccess - Rutas limpias
+  ✓ GUIA_CPANEL.md - Guía completa paso a paso
+  ✓ database/EJECUTAR_EN_CPANEL.sql - Script de áreas
+  ✓ CHECKLIST_CPANEL.txt - Este archivo
+
+═══════════════════════════════════════════════════════════════
+
+🎉 ¡LISTO PARA SUBIR A CPANEL!
+
+Lee GUIA_CPANEL.md para instrucciones detalladas.

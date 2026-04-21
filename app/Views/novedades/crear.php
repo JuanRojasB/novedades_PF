@@ -46,12 +46,12 @@
 
                 <div class="form-row">
                     <div class="form-field">
-                        <label class="required">1. Nombres y Apellidos Completos</label>
-                        <input type="text" name="nombres_apellidos" required placeholder="Escriba su respuesta">
+                        <label for="nombres_apellidos" class="required">1. Nombres y Apellidos Completos</label>
+                        <input type="text" id="nombres_apellidos" name="nombres_apellidos" required placeholder="Escriba su respuesta">
                     </div>
                     <div class="form-field">
-                        <label class="required">2. Número de Cédula</label>
-                        <input type="number" name="numero_cedula" required placeholder="Escriba su respuesta" min="0" step="1" pattern="[0-9]*">
+                        <label for="numero_cedula" class="required">2. Número de Cédula</label>
+                        <input type="number" id="numero_cedula" name="numero_cedula" required placeholder="Escriba su respuesta" min="0" step="1" pattern="[0-9]*">
                     </div>
                 </div>
             </div>
@@ -65,16 +65,16 @@
 
                 <div class="form-row">
                     <?php if (count($sedes) === 1): ?>
-                        <!-- Si solo tiene 1 sede, guardar como hidden (no mostrar nada) -->
-                        <input type="hidden" name="sede" id="sede" value="<?php echo htmlspecialchars($sedes[0]['nombre']); ?>" data-sede-id="<?php echo $sedes[0]['id']; ?>">
+                        <!-- Si solo tiene 1 sede, guardar como hidden -->
+                        <input type="hidden" name="sede" id="sede" value="<?php echo htmlspecialchars($sedes[0]['nombre']); ?>">
                     <?php else: ?>
                         <!-- Si tiene múltiples sedes, mostrar selector -->
                         <div class="form-field">
-                            <label class="required">3. Sede</label>
-                            <select name="sede" id="sede" required onchange="cargarAreasPorSede()">
+                            <label for="sede" class="required">3. Sede</label>
+                            <select name="sede" id="sede" required>
                                 <option value="">Selecciona la respuesta</option>
                                 <?php foreach ($sedes as $sede): ?>
-                                    <option value="<?php echo htmlspecialchars($sede['nombre']); ?>" data-sede-id="<?php echo $sede['id']; ?>">
+                                    <option value="<?php echo htmlspecialchars($sede['nombre']); ?>">
                                         <?php echo htmlspecialchars($sede['nombre']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -83,9 +83,20 @@
                     <?php endif; ?>
                     
                     <div class="form-field">
-                        <label class="required"><?php echo count($sedes) === 1 ? '3' : '4'; ?>. ÁREA DE TRABAJO</label>
+                        <label for="area_trabajo" class="required"><?php echo count($sedes) === 1 ? '3' : '4'; ?>. ÁREA DE TRABAJO</label>
                         <select name="area_trabajo" id="area_trabajo" required>
-                            <option value="">Primero selecciona una sede</option>
+                            <?php if (count($areas) === 1): ?>
+                                <option value="<?php echo htmlspecialchars($areas[0]['nombre']); ?>" selected>
+                                    <?php echo htmlspecialchars($areas[0]['nombre']); ?>
+                                </option>
+                            <?php else: ?>
+                                <option value="">Selecciona el área</option>
+                                <?php foreach ($areas as $area): ?>
+                                    <option value="<?php echo htmlspecialchars($area['nombre']); ?>">
+                                        <?php echo htmlspecialchars($area['nombre']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                 </div>
@@ -100,12 +111,12 @@
                 
                 <div class="form-row">
                     <div class="form-field">
-                        <label class="required"><?php echo count($sedes) === 1 ? '4' : '5'; ?>. FECHA NOVEDAD</label>
-                        <input type="date" name="fecha_novedad" required placeholder="dd/mm/aaaa">
+                        <label for="fecha_novedad" class="required"><?php echo count($sedes) === 1 ? '4' : '5'; ?>. FECHA NOVEDAD</label>
+                        <input type="date" id="fecha_novedad" name="fecha_novedad" required placeholder="dd/mm/aaaa">
                     </div>
                     <div class="form-field">
-                        <label class="required"><?php echo count($sedes) === 1 ? '5' : '6'; ?>. TURNO</label>
-                        <select name="turno" required>
+                        <label for="turno" class="required"><?php echo count($sedes) === 1 ? '5' : '6'; ?>. TURNO</label>
+                        <select id="turno" name="turno" required>
                             <option value="">Selecciona la respuesta</option>
                             <option value="DÍA">DÍA</option>
                             <option value="NOCHE">NOCHE</option>
@@ -115,8 +126,8 @@
 
                 <div class="form-row">
                     <div class="form-field">
-                        <label class="required"><?php echo count($sedes) === 1 ? '6' : '7'; ?>. NOVEDAD</label>
-                        <select name="novedad" required>
+                        <label for="novedad" class="required"><?php echo count($sedes) === 1 ? '6' : '7'; ?>. NOVEDAD</label>
+                        <select id="novedad" name="novedad" required>
                             <option value="">Selecciona la respuesta</option>
                             <?php foreach ($tipos_novedad as $tipo): ?>
                                 <option value="<?php echo htmlspecialchars($tipo['nombre']); ?>">
@@ -129,11 +140,11 @@
                         <label class="required"><?php echo count($sedes) === 1 ? '7' : '8'; ?>. JUSTIFICACIÓN</label>
                         <div class="radio-group-inline">
                             <label class="radio-label">
-                                <input type="radio" name="justificacion" value="SI" required onchange="handleJustificacionChange()">
+                                <input type="radio" id="justificacion_si" name="justificacion" value="SI" required onchange="handleJustificacionChange()">
                                 <span>SI</span>
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="justificacion" value="NO" required onchange="handleJustificacionChange()">
+                                <input type="radio" id="justificacion_no" name="justificacion" value="NO" required onchange="handleJustificacionChange()">
                                 <span>NO</span>
                             </label>
                         </div>
@@ -149,14 +160,14 @@
                 </div>
 
                 <div class="form-field">
-                    <label class="required" id="label-adjuntar"><?php echo count($sedes) === 1 ? '8' : '9'; ?>. ADJUNTAR SOPORTE</label>
+                    <label for="archivos" class="required" id="label-adjuntar"><?php echo count($sedes) === 1 ? '8' : '9'; ?>. ADJUNTAR SOPORTE</label>
                     <div class="file-upload-area">
                         <input type="file" name="archivos[]" id="archivos" multiple accept=".doc,.docx,.pdf,image/*" required>
-                        <label for="archivos" class="file-upload-label">
+                        <div class="file-upload-label">
                             <span class="upload-icon"></span>
                             <span class="upload-text">Haz clic o arrastra archivos aquí</span>
                             <span class="upload-hint">Máximo 3 archivos - Solo PDF, Word e Imágenes</span>
-                        </label>
+                        </div>
                     </div>
                     <div id="preview-container" class="preview-container"></div>
                 </div>
@@ -171,7 +182,7 @@
 
                 <div class="form-row" id="descontar-dominical-container">
                     <div class="form-field">
-                        <label class="required"><?php echo count($sedes) === 1 ? '9' : '10'; ?>. ¿SE DEBERÍA CONSIDERAR DESCONTAR EL DOMINICAL?</label>
+                        <label for="descontar_dominical" class="required"><?php echo count($sedes) === 1 ? '9' : '10'; ?>. ¿SE DEBERÍA CONSIDERAR DESCONTAR EL DOMINICAL?</label>
                         <select name="descontar_dominical" id="descontar_dominical" required>
                             <option value="">Selecciona la respuesta</option>
                             <option value="SI">SI</option>
@@ -181,7 +192,7 @@
                 </div>
 
                 <div class="form-field">
-                    <label class="required" id="label-observacion"><?php echo count($sedes) === 1 ? '10' : '11'; ?>. OBSERVACIÓN SOBRE LA NOVEDAD</label>
+                    <label for="observacion_novedad" class="required" id="label-observacion"><?php echo count($sedes) === 1 ? '10' : '11'; ?>. OBSERVACIÓN SOBRE LA NOVEDAD</label>
                     <select name="observacion_novedad" id="observacion_novedad" required>
                         <option value="">Selecciona la respuesta</option>
                         <option value="ENFERMEDAD GENERAL">ENFERMEDAD GENERAL</option>
@@ -209,8 +220,8 @@
                 </div>
 
                 <div class="form-field" style="margin-top: 1.5rem;">
-                    <label id="label-nota"><?php echo count($sedes) === 1 ? '11' : '12'; ?>. OBSERVACIONES</label>
-                    <textarea name="observaciones" rows="4" placeholder="Escriba su respuesta (opcional)"></textarea>
+                    <label for="observaciones" id="label-nota"><?php echo count($sedes) === 1 ? '11' : '12'; ?>. OBSERVACIONES</label>
+                    <textarea id="observaciones" name="observaciones" rows="4" placeholder="Escriba su respuesta (opcional)"></textarea>
                 </div>
             </div>
 
@@ -225,15 +236,19 @@
 <script>
 window.APP_BASE_URL = '<?php echo BASE_URL; ?>';
 </script>
-<script src="<?php echo asset_url('js/formulario-dinamico.js'); ?>"></script>
 <script>
-// Inicializar carga dinámica si solo hay 1 sede
+// Inicializar funcionalidad del formulario
 document.addEventListener('DOMContentLoaded', function() {
-    const sedeInput = document.getElementById('sede');
+    // Hacer que el div de upload sea clickeable
+    const fileUploadLabel = document.querySelector('.file-upload-label');
+    const fileInput = document.getElementById('archivos');
     
-    // Si es un input hidden (solo 1 sede), cargar áreas automáticamente
-    if (sedeInput && sedeInput.type === 'hidden') {
-        cargarAreasPorSede();
+    if (fileUploadLabel && fileInput) {
+        fileUploadLabel.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileUploadLabel.style.cursor = 'pointer';
     }
 });
 

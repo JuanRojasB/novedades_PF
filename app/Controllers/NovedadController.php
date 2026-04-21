@@ -23,6 +23,11 @@ class NovedadController extends Controller {
             'fecha_hasta' => $_GET['fecha_hasta'] ?? ''
         ];
         
+        // Si NO es Johanna, solo mostrar sus propias novedades
+        if (strtolower($user['nombre']) !== 'johanna') {
+            $filters['responsable'] = $user['nombre'];
+        }
+        
         // Si es jefe, filtrar solo por sus sedes
         if ($user['rol'] === 'jefe') {
             $sedesAsignadas = $usuarioModel->getSedesAsignadas($user['id']);
@@ -59,36 +64,144 @@ class NovedadController extends Controller {
     public function crear() {
         $this->requireAuth();
         
-        $user = $this->getUser();
-        $usuarioModel = new \Models\Usuario();
-        
-        // Si es jefe, solo mostrar sus sedes asignadas
-        if ($user['rol'] === 'jefe') {
-            $sedesDisponibles = $usuarioModel->getSedesAsignadas($user['id']);
+        try {
+            $user = $this->getUser();
             
-            if (empty($sedesDisponibles)) {
-                $_SESSION['error'] = 'No tienes sedes asignadas. Contacta al administrador.';
-                $this->redirect('novedades');
+            // Inicializar variables
+            $sedesDisponibles = [];
+            $areasDisponibles = [];
+            
+            // Si NO es Johanna, restringir a una sola sede y área
+            if (strtolower($user['nombre']) !== 'johanna') {
+                // Mapeo completo de usuarios a sedes y áreas (usando nombres exactos de la BD)
+                $asignaciones = [
+                    // GERENTES
+                    'hbenito' => ['sede' => 'Administrativo', 'area' => 'Asesores Comerciales S3'],
+                    'hfajardo' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                    'agarcia' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'jrestrepo' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                    'mroa' => ['sede' => 'Administrativo', 'area' => 'Publicidad'],
+                    'mroa2' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'erodriguez' => ['sede' => 'Administrativo', 'area' => 'Asesores Comerciales S1'],
+                    'drodriguez' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
+                    'ksanchez' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                    'osolano' => ['sede' => 'Administrativo', 'area' => 'Contabilidad'],
+                    
+                    // DIRECTORES
+                    'marias' => ['sede' => 'Puntos de Venta', 'area' => '20 de Julio'],
+                    'acardenas' => ['sede' => 'Sede 3', 'area' => 'Posproceso'],
+                    'ediaz' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
+                    'bferro' => ['sede' => 'Administrativo', 'area' => 'Compras'],
+                    'egonzalez' => ['sede' => 'Puntos de Venta', 'area' => 'Abastos'],
+                    'jibanez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'ymora' => ['sede' => 'Yopal', 'area' => 'Yopal PDV'],
+                    'lmurillo' => ['sede' => 'Administrativo', 'area' => 'Cartera'],
+                    'mnino' => ['sede' => 'Administrativo', 'area' => 'Publicidad'],
+                    'jrios' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
+                    'rrodriguez' => ['sede' => 'Planta', 'area' => 'Planta de Beneficio'],
+                    'krodriguez' => ['sede' => 'Planta', 'area' => 'Planta de Beneficio'],
+                    'jsanchez' => ['sede' => 'Administrativo', 'area' => 'Contabilidad'],
+                    'gzubieta' => ['sede' => 'Administrativo', 'area' => 'Auditoría'],
+                    'msanchez' => ['sede' => 'Administrativo', 'area' => 'Sistemas'],
+                    'amartinez' => ['sede' => 'Administrativo', 'area' => 'SAGRILAFT'],
+                    
+                    // JEFES
+                    'yalvarado' => ['sede' => 'Toberin', 'area' => 'Toberin'],
+                    'calfonso' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                    'langulo' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
+                    'lardila' => ['sede' => 'Yopal', 'area' => 'Yopal Bodega'],
+                    'sarevalo' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
+                    'wbernate' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
+                    'tcabana' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
+                    'hcampos' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
+                    'jcastro' => ['sede' => 'Sede 1', 'area' => 'Despachos'],
+                    'cfontalvo' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
+                    'gmarin' => ['sede' => 'Huevos', 'area' => 'Huevos'],
+                    'ymontenegro' => ['sede' => 'Administrativo', 'area' => 'Tesorería'],
+                    'aperez' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                    'cpuentes' => ['sede' => 'Sede 3', 'area' => 'Despachos'],
+                    'jrodriguez2' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'drodriguez2' => ['sede' => 'Granjas', 'area' => 'Procesados'],
+                    'eromero' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                    'cruiz' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
+                    'jurrego' => ['sede' => 'Sede 3', 'area' => 'Despachos'],
+                    
+                    // PROFESIONALES
+                    'davila' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                    'nbernal' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'mgil' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
+                    'egomez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'agonzalez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'bguerrero' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'aibarra' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'hjimenez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'njimenez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'dlinares' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                    'mmartinez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'fmonsalve' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'jortiz' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'jotero' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'jpacheco' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'kparra' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
+                    'cpulido' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'nrodriguez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    'rrodriguez2' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                    'jtirado' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'svanegas' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                    'nvivas' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                    
+                    // Usuarios de prueba
+                    'jefe_admin' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                    'jefe_yopal' => ['sede' => 'Yopal', 'area' => 'Yopal Bodega'],
+                    'jefe_pdv' => ['sede' => 'Puntos de Venta', 'area' => '20 de Julio'],
+                    'usuario' => ['sede' => 'Administrativo', 'area' => 'Sistemas'],
+                    'admin' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                ];
+                
+                // Obtener asignación del usuario actual
+                $asignacion = $asignaciones[$user['username']] ?? null;
+                
+                if ($asignacion) {
+                    $sedeAsignada = $asignacion['sede'];
+                    $areaAsignada = $asignacion['area'];
+                    
+                    // Crear array con solo su sede y área
+                    $sedesDisponibles = [['id' => 0, 'nombre' => $sedeAsignada, 'activo' => 1]];
+                    $areasDisponibles = [['id' => 0, 'nombre' => $areaAsignada, 'activo' => 1]];
+                } else {
+                    // Si no está en el mapeo, dar acceso completo temporalmente
+                    $sedeModel = new \Models\Sede();
+                    $areaModel = new \Models\AreaTrabajo();
+                    $sedesDisponibles = $sedeModel->getAll();
+                    $areasDisponibles = $areaModel->getAll();
+                }
+            } else {
+                // Johanna ve todas las sedes y áreas
+                $sedeModel = new \Models\Sede();
+                $areaModel = new \Models\AreaTrabajo();
+                $sedesDisponibles = $sedeModel->getAll();
+                $areasDisponibles = $areaModel->getAll();
             }
-        } else {
-            // Si es director, mostrar todas las sedes
-            $sedeModel = new \Models\Sede();
-            $sedesDisponibles = $sedeModel->getAll();
+            
+            // Cargar tipos de novedad (todos los usuarios ven todos)
+            $tipoNovedadModel = new \Models\TipoNovedad();
+            $tipos_novedad = $tipoNovedadModel->getAll();
+            
+            $data = [
+                'title' => 'Nueva Novedad',
+                'user' => $user,
+                'sedes' => $sedesDisponibles,
+                'areas' => $areasDisponibles,
+                'tipos_novedad' => $tipos_novedad
+            ];
+            
+            $this->view('novedades/crear', $data);
+            
+        } catch (\Exception $e) {
+            // Capturar cualquier error y mostrarlo
+            error_log("Error en NovedadController::crear - " . $e->getMessage());
+            die("Error al cargar el formulario: " . $e->getMessage() . "<br><br>Trace: " . $e->getTraceAsString());
         }
-        
-        // Cargar catálogos desde la base de datos
-        $areaModel = new \Models\AreaTrabajo();
-        $tipoNovedadModel = new \Models\TipoNovedad();
-        
-        $data = [
-            'title' => 'Nueva Novedad',
-            'user' => $user,
-            'sedes' => $sedesDisponibles,
-            'areas' => $areaModel->getAll(),
-            'tipos_novedad' => $tipoNovedadModel->getAll()
-        ];
-        
-        $this->view('novedades/crear', $data);
     }
     
     public function guardar() {

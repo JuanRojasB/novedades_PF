@@ -4,23 +4,32 @@
             <img src="<?php echo asset_url('img/logo-pollo-fiesta.png'); ?>" alt="Pollo Fiesta" class="nav-logo">
             <span class="brand-name">Sistema de Novedades</span>
         </div>
-        <div class="nav-center">
-            <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
-            <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol'] === 'director'): ?>
-                <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
-                <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
-            <?php endif; ?>
-        </div>
-        <div class="nav-actions">
-            <?php if (isset($_SESSION['user'])): ?>
-                <div class="user-info">
-                    <div class="user-details">
-                        <span class="user-name"><?php echo htmlspecialchars($_SESSION['user']['nombre']); ?></span>
-                        <span class="user-role"><?php echo htmlspecialchars($_SESSION['user']['cargo'] ?? ($_SESSION['user']['rol'] === 'director' ? 'Director' : 'Jefe')); ?></span>
+        
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <div class="nav-menu" id="navMenu">
+            <div class="nav-center">
+                <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
+                <?php if (isset($_SESSION['user']) && strtolower($_SESSION['user']['nombre']) === 'johanna'): ?>
+                    <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
+                    <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
+                <?php endif; ?>
+            </div>
+            <div class="nav-actions">
+                <?php if (isset($_SESSION['user'])): ?>
+                    <div class="user-info">
+                        <div class="user-details">
+                            <span class="user-name"><?php echo htmlspecialchars($_SESSION['user']['nombre']); ?></span>
+                            <span class="user-role"><?php echo htmlspecialchars($_SESSION['user']['cargo'] ?? ($_SESSION['user']['rol'] === 'director' ? 'Director' : 'Jefe')); ?></span>
+                        </div>
                     </div>
-                </div>
-            <?php endif; ?>
-            <a href="<?php echo base_url('logout'); ?>" class="btn-logout-nav">Cerrar Sesión</a>
+                <?php endif; ?>
+                <a href="<?php echo base_url('logout'); ?>" class="btn-logout-nav">Cerrar Sesión</a>
+            </div>
         </div>
     </div>
 </nav>
@@ -31,7 +40,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .nav-container {
@@ -43,6 +52,7 @@
     justify-content: space-between;
     min-height: 70px;
     gap: 2rem;
+    position: relative;
 }
 
 .nav-brand {
@@ -50,6 +60,7 @@
     align-items: center;
     gap: 1rem;
     flex-shrink: 0;
+    z-index: 101;
 }
 
 .nav-logo {
@@ -66,6 +77,44 @@
     font-weight: 600;
     color: white;
     white-space: nowrap;
+}
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 101;
+}
+
+.nav-toggle span {
+    width: 25px;
+    height: 3px;
+    background: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex: 1;
 }
 
 .nav-center {
@@ -144,35 +193,151 @@
 
 @media (max-width: 1024px) {
     .nav-container {
-        flex-wrap: wrap;
+        padding: 0 1.5rem;
+    }
+    
+    .brand-name {
+        font-size: 1rem;
+    }
+    
+    .nav-toggle {
+        display: flex;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 99;
+        pointer-events: none;
+    }
+    
+    .nav-menu.active {
+        max-height: 500px;
         padding: 1rem;
+        pointer-events: auto;
     }
     
     .nav-center {
-        order: 3;
+        flex-direction: column;
+        gap: 0;
         width: 100%;
-        justify-content: flex-start;
-        padding-top: 0.5rem;
+    }
+    
+    .nav-link {
+        width: 100%;
+        text-align: left;
+        padding: 0.875rem 1rem;
+        border-radius: 6px;
+    }
+    
+    .nav-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+        margin-top: 0.5rem;
+        padding-top: 1rem;
         border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .user-info {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .user-details {
+        align-items: flex-start;
+    }
+    
+    .btn-logout-nav {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        display: flex;
     }
 }
 
 @media (max-width: 768px) {
+    .nav-container {
+        padding: 0 1rem;
+        min-height: 60px;
+    }
+    
+    .nav-logo {
+        width: 40px;
+        height: 40px;
+    }
+    
     .brand-name {
         font-size: 0.9rem;
     }
     
+    .nav-menu {
+        top: 60px;
+    }
+    
     .user-name {
-        font-size: 0.85rem;
+        font-size: 0.875rem;
     }
     
     .user-role {
         font-size: 0.75rem;
     }
+}
+
+@media (max-width: 480px) {
+    .brand-name {
+        display: none;
+    }
     
-    .nav-link {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.9rem;
+    .nav-container {
+        gap: 1rem;
     }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+        
+        // Cerrar menú al hacer click en un enlace
+        const navLinks = navMenu.querySelectorAll('.nav-link, .btn-logout-nav');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+        
+        // Cerrar menú al hacer click fuera
+        document.addEventListener('click', function(e) {
+            if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                navToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        });
+        
+        // Asegurar que el menú esté cerrado al cargar la página
+        navToggle.classList.remove('active');
+        navMenu.classList.remove('active');
+    }
+});
+</script>
