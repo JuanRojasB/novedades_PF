@@ -14,7 +14,7 @@ class NovedadController extends Controller {
         $user = $this->getUser();
         
         // Solo Johanna puede ver el listado de novedades
-        if (strtolower($user['nombre']) !== 'johanna') {
+        if (stripos($user['nombre'], 'johanna') === false) {
             // Usuarios normales van directo al formulario
             $this->redirect('novedades/crear');
             return;
@@ -23,16 +23,27 @@ class NovedadController extends Controller {
         $novedadModel = new Novedad();
         $usuarioModel = new \Models\Usuario();
         
+        // Paginación
+        $porPagina = 50; // Mostrar 50 novedades por página
+        $paginaActual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
+        $offset = ($paginaActual - 1) * $porPagina;
+        
         // Obtener filtros de la URL
         $filters = [
-            'area_trabajo' => $_GET['area_trabajo'] ?? '',
-            'sede' => $_GET['sede'] ?? '',
+            'area_trabajo' => isset($_GET['area_trabajo']) && is_array($_GET['area_trabajo']) ? $_GET['area_trabajo'] : (isset($_GET['area_trabajo']) ? [$_GET['area_trabajo']] : []),
+            'sede' => isset($_GET['sede']) && is_array($_GET['sede']) ? $_GET['sede'] : (isset($_GET['sede']) ? [$_GET['sede']] : []),
+            'novedad' => isset($_GET['novedad']) && is_array($_GET['novedad']) ? $_GET['novedad'] : (isset($_GET['novedad']) ? [$_GET['novedad']] : []),
+            'justificacion' => isset($_GET['justificacion']) && is_array($_GET['justificacion']) ? $_GET['justificacion'] : (isset($_GET['justificacion']) ? [$_GET['justificacion']] : []),
             'fecha_desde' => $_GET['fecha_desde'] ?? '',
-            'fecha_hasta' => $_GET['fecha_hasta'] ?? ''
+            'fecha_hasta' => $_GET['fecha_hasta'] ?? '',
+            'limit' => $porPagina,
+            'offset' => $offset
         ];
         
-        // Johanna ve todas las novedades
+        // Johanna ve todas las novedades (con paginación)
         $novedades = $novedadModel->getAll($filters);
+        $totalNovedades = $novedadModel->getTotalNovedades($filters); // Total sin paginación
+        $totalPaginas = ceil($totalNovedades / $porPagina);
         $estadisticas = $novedadModel->getEstadisticasPorZona();
         
         // Cargar catálogos para los filtros
@@ -45,6 +56,10 @@ class NovedadController extends Controller {
             'title' => 'Novedades',
             'user' => $user,
             'novedades' => $novedades,
+            'totalNovedades' => $totalNovedades,
+            'paginaActual' => $paginaActual,
+            'totalPaginas' => $totalPaginas,
+            'porPagina' => $porPagina,
             'estadisticas' => $estadisticas,
             'filters' => $filters,
             'sedes' => $sedesDisponibles,
@@ -65,7 +80,7 @@ class NovedadController extends Controller {
             $areasDisponibles = [];
             
             // Si NO es Johanna, restringir a una sola sede y área
-            if (strtolower($user['nombre']) !== 'johanna') {
+            if (stripos($user['nombre'], 'johanna') === false) {
                 // Mapeo completo de usuarios a sedes y áreas (usando nombres exactos de la BD)
                 $asignaciones = [
                     // GERENTES
@@ -198,43 +213,44 @@ class NovedadController extends Controller {
     }
     
     public function guardar() {
-        $this->requireAuth();
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('novedades');
-        }
-        
-        $errores = [];
-        $datos = [];
-        
-        // Validar campos requeridos
-        $campos_requeridos = [
-            'nombres_apellidos', 'numero_cedula', 'sede', 'area_trabajo',
-            'fecha_novedad', 'turno', 'novedad', 'justificacion',
-            'descontar_dominical', 'observacion_novedad'
-        ];
-        
-        foreach ($campos_requeridos as $campo) {
-            if (empty($_POST[$campo])) {
-                $errores[] = "El campo '$campo' es obligatorio.";
-            } else {
-                $datos[$campo] = htmlspecialchars($_POST[$campo]);
+        try {
+            $this->requireAuth();
+            
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                $this->redirect('novedades');
             }
-        }
-        
-        // Campo opcional: zona_geografica (solo si la sede tiene zonas)
-        if (!empty($_POST['zona_geografica'])) {
-            $datos['zona_geografica'] = htmlspecialchars($_POST['zona_geografica']);
-        } else {
-            $datos['zona_geografica'] = null;
-        }
-        
-        // Campo opcional: nota (el form usa name="observaciones")
-        $datos['nota'] = !empty($_POST['observaciones']) ? htmlspecialchars($_POST['observaciones']) : null;
-        
-        // Agregar el responsable automáticamente (nombre del usuario logueado)
-        $user = $this->getUser();
-        $datos['responsable'] = $user['nombre'];
+            
+            $errores = [];
+            $datos = [];
+            
+            // Validar campos requeridos
+            $campos_requeridos = [
+                'nombres_apellidos', 'numero_cedula', 'sede', 'area_trabajo',
+                'fecha_novedad', 'turno', 'novedad', 'justificacion',
+                'es_correccion', 'descontar_dominical', 'observacion_novedad'
+            ];
+            
+            foreach ($campos_requeridos as $campo) {
+                if (empty($_POST[$campo])) {
+                    $errores[] = "El campo '$campo' es obligatorio.";
+                } else {
+                    $datos[$campo] = htmlspecialchars($_POST[$campo]);
+                }
+            }
+            
+            // Campo opcional: zona_geografica (solo si la sede tiene zonas)
+            if (!empty($_POST['zona_geografica'])) {
+                $datos['zona_geografica'] = htmlspecialchars($_POST['zona_geografica']);
+            } else {
+                $datos['zona_geografica'] = null;
+            }
+            
+            // Campo opcional: nota (el form usa name="observaciones")
+            $datos['nota'] = !empty($_POST['observaciones']) ? htmlspecialchars($_POST['observaciones']) : null;
+            
+            // Agregar el responsable automáticamente (nombre del usuario logueado)
+            $user = $this->getUser();
+            $datos['responsable'] = $user['nombre'];
         
         // Procesar archivos — guardar en filesystem
         $archivos_temp = [];
@@ -295,15 +311,30 @@ class NovedadController extends Controller {
                     }
                 }
                 
-                // Enviar correo de notificación (temporal a innovacion para pruebas)
+                // Enviar correo de notificación
                 $correoEnviado = false;
                 try {
-                    require_once APP_PATH . '/Helpers/MailHelper.php';
-                    $mailer = new \MailHelper();
+                    // Agregar el ID a los datos para el correo
+                    $datos['id'] = $novedad_id;
                     
-                    // TEMPORAL: Enviar siempre a innovacion para pruebas
-                    $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
-                    $correoEnviado = true;
+                    // DESARROLLO LOCAL: Usar simulador de correo
+                    if ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) {
+                        require_once APP_PATH . '/Helpers/MailHelperLocal.php';
+                        $mailer = new MailHelperLocal();
+                        $correoEnviado = $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                        error_log("📧 DESARROLLO: Correo simulado - Resultado: " . ($correoEnviado ? 'ÉXITO' : 'ERROR'));
+                    } else {
+                        // PRODUCCIÓN: Usar correo real
+                        require_once APP_PATH . '/Helpers/MailHelper.php';
+                        $mailer = new MailHelper();
+                        $correoEnviado = $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                        
+                        if ($correoEnviado) {
+                            error_log("✓ Correo enviado exitosamente a innovacion@pollo-fiesta.com");
+                        } else {
+                            error_log("✗ No se pudo enviar el correo");
+                        }
+                    }
                     
                     /* PRODUCCIÓN: Descomentar esto cuando esté listo
                     // Obtener el correo del usuario logueado
@@ -326,13 +357,14 @@ class NovedadController extends Controller {
                 
                 // Mensaje de éxito (siempre se muestra, aunque falle el correo)
                 if ($correoEnviado) {
-                    $_SESSION['success'] = '✅ Formulario enviado correctamente. Se ha enviado una notificación por correo.';
+                    $_SESSION['success'] = 'Formulario enviado correctamente. Se ha enviado una notificación por correo.';
                 } else {
-                    $_SESSION['success'] = '✅ Formulario enviado correctamente. (Nota: El correo no pudo ser enviado, pero la novedad fue registrada)';
+                    // En desarrollo local, el correo no se envía pero la novedad SÍ se guarda
+                    $_SESSION['success'] = 'Formulario enviado correctamente.';
                 }
                 
                 // Johanna va al listado, usuarios normales vuelven al formulario
-                if (strtolower($user['nombre']) === 'johanna') {
+                if (stripos($user['nombre'], 'johanna') !== false) {
                     $this->redirect('novedades');
                 } else {
                     $this->redirect('novedades/crear');
@@ -346,16 +378,25 @@ class NovedadController extends Controller {
             $_SESSION['errors'] = $errores;
             $this->redirect('novedades/crear');
         }
+        
+        } catch (\Exception $e) {
+            // Capturar cualquier error y mostrarlo para debugging
+            error_log("❌ ERROR CRÍTICO en NovedadController::guardar - " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            
+            $_SESSION['errors'] = ["Error del sistema: " . $e->getMessage()];
+            $this->redirect('novedades/crear');
+        }
     }
     
     public function estadisticas() {
         $this->requireAuth();
         $user = $this->getUser();
         
-        // Solo director puede ver estadísticas
-        if ($user['rol'] !== 'director') {
+        // Solo Johanna puede ver estadísticas
+        if (stripos($user['nombre'], 'johanna') === false) {
             $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
-            $this->redirect('novedades');
+            $this->redirect('novedades/crear');
         }
         
         $novedadModel = new Novedad();

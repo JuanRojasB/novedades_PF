@@ -1,147 +1,60 @@
 <?php
-// app/Helpers/MailHelper.php
-// Envío de correos via SMTP sin dependencias externas
+// app/Helpers/MailHelperLocal.php
+// Simulador de correos para desarrollo local
 
-class MailHelper {
-
-    private $config;
-
-    public function __construct() {
-        $this->config = require CONFIG_PATH . '/config.php';
-        $this->config = $this->config['mail'];
-    }
+class MailHelperLocal {
 
     /**
-     * Enviar correo de nueva novedad registrada
+     * Simular envío de correo (solo para desarrollo)
      */
     public function enviarNovedad(array $novedad, string $destinatario): bool {
-        $asunto = "Nueva Novedad Registrada - {$novedad['nombres_apellidos']}";
-        $cuerpo  = $this->plantillaNovedad($novedad);
-        return $this->enviar($destinatario, $asunto, $cuerpo);
-    }
-
-    /**
-     * Enviar correo genérico
-     */
-    public function enviar(string $para, string $asunto, string $cuerpoHtml): bool {
-        $host       = $this->config['host'];
-        $port       = $this->config['port'];
-        $encryption = $this->config['encryption'];
-        $user       = $this->config['username'];
-        $pass       = $this->config['password'];
-        $fromEmail  = $this->config['from_email'];
-        $fromName   = $this->config['from_name'];
-
         try {
-            // Conectar al servidor SMTP
-            if ($encryption === 'ssl') {
-                $socket = fsockopen("ssl://{$host}", $port, $errno, $errstr, 30);
-            } else {
-                $socket = fsockopen($host, $port, $errno, $errstr, 30);
+            $asunto = "Nueva Novedad Registrada - {$novedad['nombres_apellidos']}";
+            $cuerpo = $this->plantillaNovedad($novedad);
+            
+            // Asegurar que el directorio storage existe
+            $storageDir = dirname(dirname(__DIR__)) . '/storage';
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0755, true);
             }
-
-            if (!$socket) {
-                error_log("MailHelper: No se pudo conectar al servidor SMTP: {$errstr} ({$errno})");
+            
+            // Guardar el correo en un archivo HTML para visualizar
+            $filename = $storageDir . '/correo_' . date('Y-m-d_H-i-s') . '_' . uniqid() . '.html';
+            
+            $html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>{$asunto}</title></head><body>";
+            $html .= "<div style='background:#f0f0f0;padding:20px;'>";
+            $html .= "<h2>📧 Correo Simulado (Desarrollo Local)</h2>";
+            $html .= "<p><strong>Para:</strong> {$destinatario}</p>";
+            $html .= "<p><strong>Asunto:</strong> {$asunto}</p>";
+            $html .= "<hr>";
+            $html .= $cuerpo;
+            $html .= "</div></body></html>";
+            
+            $result = file_put_contents($filename, $html);
+            
+            if ($result === false) {
+                error_log("❌ ERROR: No se pudo guardar el correo simulado en {$filename}");
                 return false;
             }
-
-            // Leer bienvenida
-            $this->leer($socket);
-
-            // EHLO
-            $this->escribir($socket, "EHLO {$host}");
-            $this->leer($socket);
-
-            // STARTTLS si es tls
-            if ($encryption === 'tls') {
-                $this->escribir($socket, "STARTTLS");
-                $this->leer($socket);
-                stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-                $this->escribir($socket, "EHLO {$host}");
-                $this->leer($socket);
-            }
-
-            // Autenticación
-            $this->escribir($socket, "AUTH LOGIN");
-            $this->leer($socket);
-            $this->escribir($socket, base64_encode($user));
-            $this->leer($socket);
-            $this->escribir($socket, base64_encode($pass));
-            $respAuth = $this->leer($socket);
-
-            if (strpos($respAuth, '235') === false) {
-                error_log("MailHelper: Autenticación fallida: {$respAuth}");
-                fclose($socket);
-                return false;
-            }
-
-            // MAIL FROM
-            $this->escribir($socket, "MAIL FROM:<{$fromEmail}>");
-            $this->leer($socket);
-
-            // RCPT TO
-            $this->escribir($socket, "RCPT TO:<{$para}>");
-            $this->leer($socket);
-
-            // DATA
-            $this->escribir($socket, "DATA");
-            $this->leer($socket);
-
-            // Cabeceras y cuerpo
-            $fecha    = date('r');
-            $boundary = md5(uniqid());
-            $mensaje  = "From: =?UTF-8?B?" . base64_encode($fromName) . "?= <{$fromEmail}>\r\n";
-            $mensaje .= "To: {$para}\r\n";
-            $mensaje .= "Subject: =?UTF-8?B?" . base64_encode($asunto) . "?=\r\n";
-            $mensaje .= "Date: {$fecha}\r\n";
-            $mensaje .= "MIME-Version: 1.0\r\n";
-            $mensaje .= "Content-Type: text/html; charset=UTF-8\r\n";
-            $mensaje .= "Content-Transfer-Encoding: base64\r\n";
-            $mensaje .= "\r\n";
-            $mensaje .= chunk_split(base64_encode($cuerpoHtml));
-            $mensaje .= "\r\n.\r\n";
-
-            fwrite($socket, $mensaje);
-            $respData = $this->leer($socket);
-
-            // QUIT
-            $this->escribir($socket, "QUIT");
-            fclose($socket);
-
-            if (strpos($respData, '250') !== false) {
-                return true;
-            }
-
-            error_log("MailHelper: Error al enviar: {$respData}");
-            return false;
-
+            
+            // Log para desarrollo
+            error_log("📧 CORREO SIMULADO: Guardado en {$filename} para {$destinatario}");
+            
+            return true; // Simular éxito
+            
         } catch (\Exception $e) {
-            error_log("MailHelper Exception: " . $e->getMessage());
+            error_log("❌ ERROR en MailHelperLocal: " . $e->getMessage());
             return false;
         }
     }
 
-    private function escribir($socket, string $cmd): void {
-        fwrite($socket, $cmd . "\r\n");
-    }
-
-    private function leer($socket): string {
-        $respuesta = '';
-        while ($linea = fgets($socket, 515)) {
-            $respuesta .= $linea;
-            if (substr($linea, 3, 1) === ' ') break;
-        }
-        return $respuesta;
-    }
-
-    /**
-     * Plantilla HTML del correo de novedad
-     */
     private function plantillaNovedad(array $n): string {
-        $config = require CONFIG_PATH . '/config.php';
+        // Usar la misma plantilla que el MailHelper real
+        $configPath = dirname(dirname(__DIR__)) . '/config/config.php';
+        $config = require $configPath;
         
-        // Usar URL de producción real
-        $urlSistema = 'https://pollo-fiesta.com';
+        // En desarrollo, usar URL de producción para el correo
+        $urlSistema = 'https://pollo-fiesta.com'; // URL real de producción
         
         $fecha = date('d/m/Y', strtotime($n['fecha_novedad']));
         $just  = $n['justificacion'] === 'SI'

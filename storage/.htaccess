@@ -1,0 +1,11 @@
+# Permitir acceso a archivos HTML de correos simulados
+<Files "correo_*.html">
+    Order allow,deny
+    Allow from all
+</Files>
+
+# Denegar acceso a otros archivos
+<FilesMatch "^(?!correo_.*\.html$).*">
+    Order deny,allow
+    Deny from all
+</FilesMatch>

@@ -13,10 +13,13 @@
         
         <div class="nav-menu" id="navMenu">
             <div class="nav-center">
-                <?php if (isset($_SESSION['user']) && strtolower($_SESSION['user']['nombre']) === 'johanna'): ?>
+                <?php if (isset($_SESSION['user']) && stripos($_SESSION['user']['nombre'], 'johanna') !== false): ?>
                     <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
                     <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
                     <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
+                    <?php if ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false): ?>
+                        <a href="/informe-novedades/public/ver_correos_simulados.php" class="nav-link" style="background: rgba(255, 255, 255, 0.15);">📧 Correos Dev</a>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
             <div class="nav-actions">
@@ -67,9 +70,6 @@
     width: 45px;
     height: 45px;
     object-fit: contain;
-    background: white;
-    border-radius: 8px;
-    padding: 4px;
 }
 
 .brand-name {

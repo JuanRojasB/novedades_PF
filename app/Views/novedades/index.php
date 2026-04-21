@@ -19,39 +19,116 @@
     <div class="search-filters-container">
         <!-- Búsqueda -->
         <div class="search-section">
-            <input type="text" id="busqueda-rapida" placeholder="Buscar por ID, nombre, cédula, área, sede..." autocomplete="off">
+            <input type="text" id="busqueda-rapida" placeholder="Buscar por ID, nombre, cédula, sede, área..." autocomplete="off">
             <span id="busqueda-count" class="search-count"></span>
         </div>
 
         <!-- Filtros -->
         <div class="filters-section">
-            <form method="GET" action="<?php echo base_url('novedades'); ?>" class="filters-form">
-                <div class="filter-group">
-                    <label>Área</label>
-                    <select name="area_trabajo">
-                        <option value="">Todas</option>
-                        <?php foreach ($areas as $area): ?>
-                            <option value="<?php echo htmlspecialchars($area['nombre']); ?>"
-                                    <?php echo ($filters['area_trabajo'] ?? '') === $area['nombre'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($area['nombre']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+            <form method="GET" action="<?php echo base_url('novedades'); ?>" class="filters-form" id="filtrosForm">
+                <!-- Filtro Tipo de Novedad -->
+                <div class="filter-dropdown">
+                    <button type="button" class="filter-dropdown-btn" onclick="toggleFilterDropdown('novedad')">
+                        <span>Tipo de Novedad</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-dropdown-content" id="dropdown-novedad">
+                        <div class="filter-search">
+                            <input type="text" placeholder="Buscar..." onkeyup="filterOptions('novedad', this.value)">
+                        </div>
+                        <div class="filter-options" id="options-novedad">
+                            <?php 
+                            $tiposNovedad = ['AISLAMIENTO', 'AUSENCIA', 'INCAPACIDAD', 'NOTIFICACIÓN', 'PERMISO NO REMUNERADO', 'PERMISO REMUNERADO', 'REINTEGRO DE AUSENCIA/SANCIÓN', 'REINTEGRO DE INCAPACIDAD', 'REINTEGRO DE VACACIONES', 'RENUNCIA', 'VACACIONES'];
+                            $novedadSeleccionadas = $filters['novedad'] ?? [];
+                            foreach ($tiposNovedad as $tipo): 
+                                $isChecked = in_array($tipo, $novedadSeleccionadas) ? 'checked' : '';
+                            ?>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="novedad[]" value="<?php echo htmlspecialchars($tipo); ?>" class="filter-checkbox" <?php echo $isChecked; ?>>
+                                    <span><?php echo htmlspecialchars($tipo); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="filter-group">
-                    <label>Sede</label>
-                    <select name="sede">
-                        <option value="">Todas</option>
-                        <?php foreach ($sedes as $sede): ?>
-                            <option value="<?php echo htmlspecialchars($sede['nombre']); ?>"
-                                    <?php echo ($filters['sede'] ?? '') === $sede['nombre'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($sede['nombre']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                <!-- Filtro Sede -->
+                <div class="filter-dropdown">
+                    <button type="button" class="filter-dropdown-btn" onclick="toggleFilterDropdown('sede')">
+                        <span>Sede</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-dropdown-content" id="dropdown-sede">
+                        <div class="filter-search">
+                            <input type="text" placeholder="Buscar..." onkeyup="filterOptions('sede', this.value)">
+                        </div>
+                        <div class="filter-options" id="options-sede">
+                            <?php 
+                            $sedeSeleccionadas = $filters['sede'] ?? [];
+                            foreach ($sedes as $sede): 
+                                $isChecked = in_array($sede['nombre'], $sedeSeleccionadas) ? 'checked' : '';
+                            ?>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="sede[]" value="<?php echo htmlspecialchars($sede['nombre']); ?>" class="filter-checkbox" <?php echo $isChecked; ?>>
+                                    <span><?php echo htmlspecialchars($sede['nombre']); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- Filtro Área -->
+                <div class="filter-dropdown">
+                    <button type="button" class="filter-dropdown-btn" onclick="toggleFilterDropdown('area')">
+                        <span>Área</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-dropdown-content" id="dropdown-area">
+                        <div class="filter-search">
+                            <input type="text" placeholder="Buscar..." onkeyup="filterOptions('area', this.value)">
+                        </div>
+                        <div class="filter-options" id="options-area">
+                            <?php 
+                            $areaSeleccionadas = $filters['area_trabajo'] ?? [];
+                            foreach ($areas as $area): 
+                                $isChecked = in_array($area['nombre'], $areaSeleccionadas) ? 'checked' : '';
+                            ?>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="area_trabajo[]" value="<?php echo htmlspecialchars($area['nombre']); ?>" class="filter-checkbox" <?php echo $isChecked; ?>>
+                                    <span><?php echo htmlspecialchars($area['nombre']); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtro Justificación -->
+                <div class="filter-dropdown">
+                    <button type="button" class="filter-dropdown-btn" onclick="toggleFilterDropdown('justificacion')">
+                        <span>Justificación</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-dropdown-content" id="dropdown-justificacion">
+                        <div class="filter-options">
+                            <?php 
+                            $justificacionSeleccionadas = $filters['justificacion'] ?? [];
+                            $justificacionOpciones = [
+                                'SI' => 'Sí',
+                                'NO' => 'No'
+                            ];
+                            foreach ($justificacionOpciones as $valor => $texto): 
+                                $isChecked = in_array($valor, $justificacionSeleccionadas) ? 'checked' : '';
+                            ?>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="justificacion[]" value="<?php echo $valor; ?>" class="filter-checkbox" <?php echo $isChecked; ?>>
+                                    <span><?php echo $texto; ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros de Fecha -->
                 <div class="filter-group">
                     <label>Desde</label>
                     <input type="date" name="fecha_desde" value="<?php echo $filters['fecha_desde'] ?? ''; ?>">
@@ -62,36 +139,21 @@
                     <input type="date" name="fecha_hasta" value="<?php echo $filters['fecha_hasta'] ?? ''; ?>">
                 </div>
 
-                <div class="filter-group">
-                    <label>Justificación</label>
-                    <select name="justificacion">
-                        <option value="">Todas</option>
-                        <option value="SI" <?php echo ($filters['justificacion'] ?? '') === 'SI' ? 'selected' : ''; ?>>Sí</option>
-                        <option value="NO" <?php echo ($filters['justificacion'] ?? '') === 'NO' ? 'selected' : ''; ?>>No</option>
-                    </select>
-                </div>
-
                 <div class="filter-actions">
-                    <button type="submit" class="btn-filter">Filtrar</button>
+                    <button type="submit" class="btn-filter">Aplicar Filtros</button>
                     <a href="<?php echo base_url('novedades'); ?>" class="btn-clear">Limpiar</a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Stats (solo director) -->
-    <?php if ($user['rol'] === 'director' && !empty($estadisticas)): ?>
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value"><?php echo count($novedades); ?></div>
-            <div class="stat-label">Total Novedades</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value"><?php echo count($estadisticas); ?></div>
-            <div class="stat-label">Áreas Activas</div>
+    <!-- Total de Novedades -->
+    <div class="stats-summary">
+        <div class="total-novedades">
+            <span class="total-value"><?php echo number_format($totalNovedades, 0, ',', '.'); ?></span>
+            <span class="total-label">Novedades Registradas</span>
         </div>
     </div>
-    <?php endif; ?>
 
     <!-- Tabla -->
     <div class="table-container">
@@ -182,6 +244,70 @@
                 </tbody>
             </table>
         <?php endif; ?>
+        
+        <!-- Paginación -->
+        <?php if ($totalPaginas > 1): ?>
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Mostrando <strong><?php echo (($paginaActual - 1) * $porPagina) + 1; ?>-<?php echo min($paginaActual * $porPagina, $totalNovedades); ?></strong> de <strong><?php echo number_format($totalNovedades, 0, ',', '.'); ?></strong> novedades
+            </div>
+            
+            <div class="pagination">
+                <?php
+                // Construir URL base con filtros
+                $queryParams = $_GET;
+                unset($queryParams['pagina']); // Remover página actual
+                $baseUrl = base_url('novedades');
+                if (!empty($queryParams)) {
+                    $baseUrl .= '?' . http_build_query($queryParams) . '&';
+                } else {
+                    $baseUrl .= '?';
+                }
+                ?>
+                
+                <!-- Anterior -->
+                <?php if ($paginaActual > 1): ?>
+                    <a href="<?php echo $baseUrl . 'pagina=' . ($paginaActual - 1); ?>" class="pagination-btn">‹ Anterior</a>
+                <?php else: ?>
+                    <span class="pagination-btn disabled">‹ Anterior</span>
+                <?php endif; ?>
+                
+                <!-- Páginas numeradas -->
+                <?php
+                $rango = 2;
+                $inicio = max(1, $paginaActual - $rango);
+                $fin = min($totalPaginas, $paginaActual + $rango);
+                
+                if ($inicio > 1): ?>
+                    <a href="<?php echo $baseUrl . 'pagina=1'; ?>" class="pagination-btn">1</a>
+                    <?php if ($inicio > 2): ?>
+                        <span class="pagination-dots">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                
+                <?php for ($i = $inicio; $i <= $fin; $i++): ?>
+                    <a href="<?php echo $baseUrl . 'pagina=' . $i; ?>" 
+                       class="pagination-btn <?php echo $i === $paginaActual ? 'active' : ''; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                <?php endfor; ?>
+                
+                <?php if ($fin < $totalPaginas): ?>
+                    <?php if ($fin < $totalPaginas - 1): ?>
+                        <span class="pagination-dots">...</span>
+                    <?php endif; ?>
+                    <a href="<?php echo $baseUrl . 'pagina=' . $totalPaginas; ?>" class="pagination-btn"><?php echo $totalPaginas; ?></a>
+                <?php endif; ?>
+                
+                <!-- Siguiente -->
+                <?php if ($paginaActual < $totalPaginas): ?>
+                    <a href="<?php echo $baseUrl . 'pagina=' . ($paginaActual + 1); ?>" class="pagination-btn">Siguiente ›</a>
+                <?php else: ?>
+                    <span class="pagination-btn disabled">Siguiente ›</span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
 </main>
@@ -214,6 +340,22 @@
 .page-header h1 { margin: 0; font-size: 1.5rem; color: #1e293b; font-weight: 600; }
 .total-badge { background: #dbeafe; color: #1e40af; font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 999px; }
 
+/* Total de Novedades */
+.stats-summary { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 8px; box-shadow: 0 2px 8px rgba(30,64,175,0.2); padding: 1.5rem 2rem; margin-bottom: 1.5rem; }
+.total-novedades { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.total-value { font-size: 2.5rem; color: #fff; font-weight: 700; line-height: 1; }
+.total-label { font-size: 0.95rem; color: rgba(255,255,255,0.9); font-weight: 500; }
+
+/* Paginación */
+.pagination-container { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.25rem; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+.pagination-info { font-size: 0.875rem; color: #64748b; text-align: center; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 0.375rem; flex-wrap: wrap; }
+.pagination-btn { padding: 0.5rem 0.75rem; min-width: 40px; border: 1px solid #cbd5e1; border-radius: 6px; color: #475569; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: all 0.15s ease; text-align: center; }
+.pagination-btn:hover:not(.disabled):not(.active) { background: #f8fafc; border-color: #94a3b8; transform: translateY(-1px); }
+.pagination-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; font-weight: 600; }
+.pagination-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination-dots { color: #94a3b8; padding: 0 0.25rem; font-weight: 600; }
+
 /* Búsqueda y Filtros */
 .search-filters-container { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.25rem; margin-bottom: 1.5rem; }
 
@@ -223,15 +365,41 @@
 .search-count { font-size: 0.8rem; color: #3b82f6; font-weight: 600; background: #eff6ff; padding: 0.3rem 0.7rem; border-radius: 999px; white-space: nowrap; }
 
 .filters-section { }
-.filters-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; align-items: end; }
-.filter-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.filters-form { display: grid; grid-template-columns: repeat(4, 1fr) auto auto auto; gap: 1rem; align-items: end; }
+
+/* Filtros Dropdown con Checkboxes */
+.filter-dropdown { position: relative; min-width: 160px; }
+.filter-dropdown-btn { width: 100%; padding: 0.65rem 0.75rem; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s ease; height: 42px; }
+.filter-dropdown-btn:hover { border-color: #94a3b8; }
+.filter-dropdown-btn.active { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.filter-arrow { font-size: 0.7rem; color: #94a3b8; transition: transform 0.2s ease; }
+.filter-dropdown-btn.active .filter-arrow { transform: rotate(180deg); }
+
+.filter-dropdown-content { position: absolute; top: calc(100% + 0.5rem); left: 0; right: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; display: none; max-height: 300px; overflow: hidden; min-width: 200px; }
+.filter-dropdown-content.show { display: block; }
+
+.filter-search { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+.filter-search input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.8rem; outline: none; }
+.filter-search input:focus { border-color: #3b82f6; }
+
+.filter-options { max-height: 240px; overflow-y: auto; padding: 0.5rem; }
+.filter-option { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; margin-bottom: 2px; }
+.filter-option:hover { background: #f1f5f9; }
+.filter-option.selected { background: #eff6ff; border: 1px solid #bfdbfe; }
+.filter-option:has(.filter-checkbox:checked) { background: #eff6ff; border: 1px solid #bfdbfe; }
+.filter-checkbox { cursor: pointer; width: 18px; height: 18px; accent-color: #3b82f6; border-radius: 3px; }
+.filter-option span { font-size: 0.875rem; color: #334155; user-select: none; line-height: 1.4; }
+.filter-option.selected span { color: #1e40af; font-weight: 500; }
+.filter-option:has(.filter-checkbox:checked) span { color: #1e40af; font-weight: 500; }
+
+.filter-group { display: flex; flex-direction: column; gap: 0.4rem; min-width: 120px; }
 .filter-group label { font-size: 0.8rem; font-weight: 600; color: #475569; }
-.filter-group select, .filter-group input { padding: 0.65rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; outline: none; }
+.filter-group select, .filter-group input { padding: 0.65rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.875rem; outline: none; height: 42px; }
 .filter-group select:focus, .filter-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-.filter-actions { display: flex; gap: 0.5rem; }
-.btn-filter { padding: 0.65rem 1.25rem; background: #3b82f6; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.filter-actions { display: flex; gap: 0.5rem; align-items: end; }
+.btn-filter { padding: 0.65rem 1.25rem; background: #3b82f6; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; white-space: nowrap; height: 42px; }
 .btn-filter:hover { background: #2563eb; }
-.btn-clear { padding: 0.65rem 1.25rem; background: #fff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 500; text-decoration: none; display: flex; align-items: center; white-space: nowrap; }
+.btn-clear { padding: 0.65rem 1.25rem; background: #fff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 500; text-decoration: none; display: flex; align-items: center; white-space: nowrap; height: 42px; }
 .btn-clear:hover { background: #f8fafc; }
 
 /* Tabla */
@@ -313,6 +481,7 @@
     .filters-form { grid-template-columns: 1fr; }
     .filter-actions { flex-direction: column; }
     .btn-filter, .btn-clear { width: 100%; justify-content: center; }
+    .filter-dropdown-content { min-width: auto; left: 0; right: 0; }
 }
 </style>
 
@@ -527,6 +696,148 @@ function cerrarModalArchivos() {
 
 document.getElementById('modal-archivos').addEventListener('click', e => {
     if (e.target === e.currentTarget) cerrarModalArchivos();
+});
+
+// ===== FILTROS DESPLEGABLES CON CHECKBOXES =====
+
+// Toggle dropdown
+function toggleFilterDropdown(id) {
+    const dropdown = document.getElementById('dropdown-' + id);
+    const btn = dropdown.previousElementSibling;
+    const isOpen = dropdown.classList.contains('show');
+    
+    // Cerrar todos los dropdowns
+    document.querySelectorAll('.filter-dropdown-content').forEach(d => {
+        d.classList.remove('show');
+    });
+    document.querySelectorAll('.filter-dropdown-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    
+    // Abrir/cerrar el actual
+    if (!isOpen) {
+        dropdown.classList.add('show');
+        btn.classList.add('active');
+    }
+}
+
+// Filtrar opciones por búsqueda
+function filterOptions(id, searchText) {
+    const options = document.querySelectorAll('#options-' + id + ' .filter-option');
+    const search = searchText.toLowerCase();
+    
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        option.style.display = text.includes(search) ? 'flex' : 'none';
+    });
+}
+
+// Cerrar dropdowns al hacer click fuera
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.filter-dropdown')) {
+        document.querySelectorAll('.filter-dropdown-content').forEach(d => {
+            d.classList.remove('show');
+        });
+        document.querySelectorAll('.filter-dropdown-btn').forEach(b => {
+            b.classList.remove('active');
+        });
+    }
+});
+
+// Actualizar texto del botón con cantidad de seleccionados
+document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const dropdown = this.closest('.filter-dropdown');
+        const btn = dropdown.querySelector('.filter-dropdown-btn span:first-child');
+        const checkboxes = dropdown.querySelectorAll('.filter-checkbox:checked');
+        const count = checkboxes.length;
+        
+        // Obtener el texto original del botón
+        const originalText = btn.textContent.split(' (')[0];
+        
+        if (count > 0) {
+            btn.textContent = originalText + ' (' + count + ')';
+        } else {
+            btn.textContent = originalText;
+        }
+        
+        // Agregar clase 'selected' al label para estilos
+        const option = this.closest('.filter-option');
+        if (this.checked) {
+            option.classList.add('selected');
+        } else {
+            option.classList.remove('selected');
+        }
+    });
+});
+
+// Inicializar contadores al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+        const btn = dropdown.querySelector('.filter-dropdown-btn span:first-child');
+        const checkboxes = dropdown.querySelectorAll('.filter-checkbox:checked');
+        const count = checkboxes.length;
+        
+        if (count > 0) {
+            const originalText = btn.textContent.split(' (')[0];
+            btn.textContent = originalText + ' (' + count + ')';
+        }
+        
+        // Agregar clase 'selected' a opciones marcadas
+        checkboxes.forEach(checkbox => {
+            checkbox.closest('.filter-option').classList.add('selected');
+        });
+    });
+});
+
+// ===== FILTRADO DINÁMICO DE ÁREAS POR SEDE =====
+const sedeAreaMap = <?php 
+    // Crear mapeo de sede -> áreas desde PHP
+    $sedeAreaMap = [];
+    foreach ($areas as $area) {
+        if (!empty($area['sede_id'])) {
+            // Buscar el nombre de la sede
+            foreach ($sedes as $sede) {
+                if ($sede['id'] == $area['sede_id']) {
+                    if (!isset($sedeAreaMap[$sede['nombre']])) {
+                        $sedeAreaMap[$sede['nombre']] = [];
+                    }
+                    $sedeAreaMap[$sede['nombre']][] = $area['nombre'];
+                    break;
+                }
+            }
+        }
+    }
+    echo json_encode($sedeAreaMap);
+?>;
+
+// Filtrado de áreas por sede en los checkboxes
+document.querySelectorAll('#options-sede .filter-checkbox').forEach(sedeCheckbox => {
+    sedeCheckbox.addEventListener('change', function() {
+        const sedesSeleccionadas = Array.from(document.querySelectorAll('#options-sede .filter-checkbox:checked'))
+            .map(cb => cb.value);
+        
+        const areaOptions = document.querySelectorAll('#options-area .filter-option');
+        
+        if (sedesSeleccionadas.length === 0) {
+            // Si no hay sedes seleccionadas, mostrar todas las áreas
+            areaOptions.forEach(option => {
+                option.style.display = 'flex';
+            });
+        } else {
+            // Mostrar solo las áreas de las sedes seleccionadas
+            const areasPermitidas = new Set();
+            sedesSeleccionadas.forEach(sede => {
+                const areas = sedeAreaMap[sede] || [];
+                areas.forEach(area => areasPermitidas.add(area));
+            });
+            
+            areaOptions.forEach(option => {
+                const areaValue = option.querySelector('.filter-checkbox').value;
+                option.style.display = areasPermitidas.has(areaValue) ? 'flex' : 'none';
+            });
+        }
+    });
 });
 </script>
 

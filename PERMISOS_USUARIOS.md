@@ -4,12 +4,12 @@
 
 El sistema tiene dos niveles de acceso:
 
-1. **Johanna** (administradora) - Acceso completo
-2. **Usuarios normales** - Solo pueden crear novedades
+1. **Johanna** (administradora única) - Acceso completo a todo
+2. **Usuarios normales** (todos los demás) - Solo pueden crear novedades
 
 ## Permisos por Usuario
 
-### JOHANNA (Administradora)
+### JOHANNA (Administradora Única)
 ✅ Ver listado completo de novedades  
 ✅ Crear nuevas novedades  
 ✅ Ver estadísticas y gráficos  
@@ -18,9 +18,27 @@ El sistema tiene dos niveles de acceso:
 ✅ Ver todas las sedes y áreas  
 
 **Menú visible:**
-- Ver Novedades
-- Estadísticas
+- Ver Novedades (dashboard con listado completo)
+- Estadísticas (gráficos y análisis)
 - Administración
+
+**Dashboard incluye:**
+- Listado completo de todas las novedades
+- Filtros por sede, área, fecha
+- Búsqueda por empleado, cédula
+- Ordenamiento de columnas
+- Estadísticas resumidas
+
+**Estadísticas incluye:**
+- Gráficos por sede
+- Gráficos por tipo de novedad
+- Gráficos por justificación
+- Gráficos por área
+- Gráficos por turno
+- Análisis de descuento dominical
+- Tendencias por mes
+- Top responsables
+- Conclusiones automáticas de Copilot
 
 ### USUARIOS NORMALES (Todos los demás)
 ✅ Crear nuevas novedades  
@@ -104,10 +122,41 @@ if (strtolower($user['nombre']) === 'johanna') {
 
 | Ruta | Johanna | Usuarios Normales |
 |------|---------|-------------------|
-| `/novedades` | ✅ Listado completo | ❌ Redirige a `/novedades/crear` |
+| `/novedades` | ✅ Dashboard completo con listado | ❌ Redirige a `/novedades/crear` |
 | `/novedades/crear` | ✅ Formulario completo | ✅ Formulario restringido |
-| `/estadisticas` | ✅ Acceso completo | ❌ Acceso denegado |
+| `/estadisticas` | ✅ Gráficos y análisis completo | ❌ Redirige a `/novedades/crear` |
 | `/admin` | ✅ Acceso completo | ❌ Acceso denegado |
+
+## Resumen de Accesos
+
+### Dashboard (Ver Novedades)
+**Solo Johanna tiene acceso**
+
+Incluye:
+- Tabla con todas las novedades registradas
+- Filtros: sede, área, fecha desde/hasta
+- Búsqueda: por empleado o cédula
+- Ordenamiento: click en columnas (ID, Fecha, Empleado, etc.)
+- Botón "Nueva Novedad"
+- Estadísticas resumidas en cards
+
+### Estadísticas y Gráficos
+**Solo Johanna tiene acceso**
+
+Incluye:
+- Gráfico de novedades por sede
+- Gráfico de novedades por tipo
+- Gráfico de justificación vs no justificación
+- Gráfico de novedades por área
+- Gráfico de novedades por turno
+- Análisis de descuento dominical
+- Tendencias mensuales
+- Top 10 responsables
+- Conclusiones automáticas de Copilot
+
+### Formulario de Creación
+**Johanna:** Acceso completo (todas las sedes y áreas)  
+**Usuarios normales:** Acceso restringido (solo su sede y área)
 
 ## Cambios Implementados
 

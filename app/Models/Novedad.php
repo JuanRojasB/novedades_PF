@@ -32,16 +32,40 @@ class Novedad {
             $params = array_merge($params, $filters['sedes_permitidas']);
         }
         
-        // Filtro por zona/área
+        // Filtro por zona/área (soporta múltiples valores)
         if (!empty($filters['area_trabajo'])) {
-            $sql .= " AND n.area_trabajo = ?";
-            $params[] = $filters['area_trabajo'];
+            if (is_array($filters['area_trabajo']) && count($filters['area_trabajo']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['area_trabajo']) - 1) . '?';
+                $sql .= " AND n.area_trabajo IN ($placeholders)";
+                $params = array_merge($params, $filters['area_trabajo']);
+            } elseif (!is_array($filters['area_trabajo'])) {
+                $sql .= " AND n.area_trabajo = ?";
+                $params[] = $filters['area_trabajo'];
+            }
         }
         
-        // Filtro por sede
+        // Filtro por sede (soporta múltiples valores)
         if (!empty($filters['sede'])) {
-            $sql .= " AND n.sede = ?";
-            $params[] = $filters['sede'];
+            if (is_array($filters['sede']) && count($filters['sede']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['sede']) - 1) . '?';
+                $sql .= " AND n.sede IN ($placeholders)";
+                $params = array_merge($params, $filters['sede']);
+            } elseif (!is_array($filters['sede'])) {
+                $sql .= " AND n.sede = ?";
+                $params[] = $filters['sede'];
+            }
+        }
+        
+        // Filtro por tipo de novedad (soporta múltiples valores)
+        if (!empty($filters['novedad'])) {
+            if (is_array($filters['novedad']) && count($filters['novedad']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['novedad']) - 1) . '?';
+                $sql .= " AND n.novedad IN ($placeholders)";
+                $params = array_merge($params, $filters['novedad']);
+            } elseif (!is_array($filters['novedad'])) {
+                $sql .= " AND n.novedad = ?";
+                $params[] = $filters['novedad'];
+            }
         }
         
         // Filtro por fecha
@@ -55,13 +79,112 @@ class Novedad {
             $params[] = $filters['fecha_hasta'];
         }
         
+        // Filtro por justificación (soporta múltiples valores)
+        if (!empty($filters['justificacion'])) {
+            if (is_array($filters['justificacion']) && count($filters['justificacion']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['justificacion']) - 1) . '?';
+                $sql .= " AND n.justificacion IN ($placeholders)";
+                $params = array_merge($params, $filters['justificacion']);
+            } elseif (!is_array($filters['justificacion'])) {
+                $sql .= " AND n.justificacion = ?";
+                $params[] = $filters['justificacion'];
+            }
+        }
+        
         $sql .= " ORDER BY n.created_at DESC, n.fecha_novedad DESC";
-        $sql .= " LIMIT 500";
+        
+        // Paginación
+        if (isset($filters['limit'])) {
+            $sql .= " LIMIT " . intval($filters['limit']);
+            if (isset($filters['offset'])) {
+                $sql .= " OFFSET " . intval($filters['offset']);
+            }
+        }
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         
         return $stmt->fetchAll();
+    }
+    
+    public function getTotalNovedades($filters = []) {
+        $sql = "SELECT COUNT(*) as total FROM novedades n WHERE 1=1";
+        $params = [];
+        
+        // Aplicar los mismos filtros que en getAll()
+        if (!empty($filters['responsable'])) {
+            $sql .= " AND n.responsable = ?";
+            $params[] = $filters['responsable'];
+        }
+        
+        if (!empty($filters['sedes_permitidas'])) {
+            $placeholders = str_repeat('?,', count($filters['sedes_permitidas']) - 1) . '?';
+            $sql .= " AND n.sede IN ($placeholders)";
+            $params = array_merge($params, $filters['sedes_permitidas']);
+        }
+        
+        // Filtro por zona/área (soporta múltiples valores)
+        if (!empty($filters['area_trabajo'])) {
+            if (is_array($filters['area_trabajo']) && count($filters['area_trabajo']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['area_trabajo']) - 1) . '?';
+                $sql .= " AND n.area_trabajo IN ($placeholders)";
+                $params = array_merge($params, $filters['area_trabajo']);
+            } elseif (!is_array($filters['area_trabajo'])) {
+                $sql .= " AND n.area_trabajo = ?";
+                $params[] = $filters['area_trabajo'];
+            }
+        }
+        
+        // Filtro por sede (soporta múltiples valores)
+        if (!empty($filters['sede'])) {
+            if (is_array($filters['sede']) && count($filters['sede']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['sede']) - 1) . '?';
+                $sql .= " AND n.sede IN ($placeholders)";
+                $params = array_merge($params, $filters['sede']);
+            } elseif (!is_array($filters['sede'])) {
+                $sql .= " AND n.sede = ?";
+                $params[] = $filters['sede'];
+            }
+        }
+        
+        // Filtro por tipo de novedad (soporta múltiples valores)
+        if (!empty($filters['novedad'])) {
+            if (is_array($filters['novedad']) && count($filters['novedad']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['novedad']) - 1) . '?';
+                $sql .= " AND n.novedad IN ($placeholders)";
+                $params = array_merge($params, $filters['novedad']);
+            } elseif (!is_array($filters['novedad'])) {
+                $sql .= " AND n.novedad = ?";
+                $params[] = $filters['novedad'];
+            }
+        }
+        
+        if (!empty($filters['fecha_desde'])) {
+            $sql .= " AND n.fecha_novedad >= ?";
+            $params[] = $filters['fecha_desde'];
+        }
+        
+        if (!empty($filters['fecha_hasta'])) {
+            $sql .= " AND n.fecha_novedad <= ?";
+            $params[] = $filters['fecha_hasta'];
+        }
+        
+        // Filtro por justificación (soporta múltiples valores)
+        if (!empty($filters['justificacion'])) {
+            if (is_array($filters['justificacion']) && count($filters['justificacion']) > 0) {
+                $placeholders = str_repeat('?,', count($filters['justificacion']) - 1) . '?';
+                $sql .= " AND n.justificacion IN ($placeholders)";
+                $params = array_merge($params, $filters['justificacion']);
+            } elseif (!is_array($filters['justificacion'])) {
+                $sql .= " AND n.justificacion = ?";
+                $params[] = $filters['justificacion'];
+            }
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        
+        return $stmt->fetchColumn();
     }
 
     public function getById($id) {
@@ -73,11 +196,11 @@ class Novedad {
     public function create($data) {
         $sql = "INSERT INTO novedades (
             nombres_apellidos, numero_cedula, sede, zona_geografica, area_trabajo,
-            fecha_novedad, turno, novedad, justificacion,
+            fecha_novedad, turno, novedad, justificacion, es_correccion,
             descontar_dominical, observacion_novedad, nota, responsable
         ) VALUES (
             :nombres_apellidos, :numero_cedula, :sede, :zona_geografica, :area_trabajo,
-            :fecha_novedad, :turno, :novedad, :justificacion,
+            :fecha_novedad, :turno, :novedad, :justificacion, :es_correccion,
             :descontar_dominical, :observacion_novedad, :nota, :responsable
         )";
 
@@ -93,6 +216,7 @@ class Novedad {
             ':turno'              => $data['turno'],
             ':novedad'            => $data['novedad'],
             ':justificacion'      => $data['justificacion'],
+            ':es_correccion'      => $data['es_correccion'],
             ':descontar_dominical'=> $data['descontar_dominical'],
             ':observacion_novedad'=> $data['observacion_novedad'],
             ':nota'               => $data['nota'] ?? null,
@@ -161,14 +285,6 @@ class Novedad {
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
-    }
-    
-    // Obtener total de novedades
-    public function getTotalNovedades() {
-        $sql = "SELECT COUNT(*) as total FROM novedades";
-        $stmt = $this->db->query($sql);
-        $result = $stmt->fetch();
-        return $result['total'];
     }
     
     // Obtener novedades por sede

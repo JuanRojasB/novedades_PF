@@ -34,12 +34,12 @@ return [
     ],
 
     'mail' => [
-        'host'       => 'innovacion@pollo-fiesta.com', // CAMBIAR por tu dominio
+        'host'       => 'pollo-fiesta.com', // Servidor SMTP del dominio
         'port'       => 465,
         'encryption' => 'ssl',
-        'username'   => 'innovacion@pollo-fiesta.com', // CAMBIAR
-        'password'   => 'Sistemas2026*', // CAMBIAR
-        'from_email' => 'innovacion@pollo-fiesta.com', // CAMBIAR
+        'username'   => 'innovacion@pollo-fiesta.com',
+        'password'   => '^8znu9HDk[D2#)y-', // CAMBIAR: poner la contraseña real del correo
+        'from_email' => 'innovacion@pollo-fiesta.com',
         'from_name'  => 'Sistema de Novedades - Pollo Fiesta',
     ]
 ];

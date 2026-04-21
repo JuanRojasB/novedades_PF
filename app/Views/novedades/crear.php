@@ -37,7 +37,6 @@
 
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success">
-            <span class="alert-icon">✅</span>
             <strong><?php echo $_SESSION['success']; ?></strong>
         </div>
         <?php unset($_SESSION['success']); ?>
@@ -188,9 +187,20 @@
                     <h2>Información Adicional</h2>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="es_correccion" class="required"><?php echo count($sedes) === 1 ? '9' : '10'; ?>. ¿ES CORRECCIÓN DE UNA NOVEDAD YA REPORTADA?</label>
+                        <select name="es_correccion" id="es_correccion" required>
+                            <option value="">Selecciona la respuesta</option>
+                            <option value="SI">SI</option>
+                            <option value="NO">NO</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-row" id="descontar-dominical-container">
                     <div class="form-field">
-                        <label for="descontar_dominical" class="required"><?php echo count($sedes) === 1 ? '9' : '10'; ?>. ¿SE DEBERÍA CONSIDERAR DESCONTAR EL DOMINICAL?</label>
+                        <label for="descontar_dominical" class="required"><?php echo count($sedes) === 1 ? '10' : '11'; ?>. ¿SE DEBERÍA CONSIDERAR DESCONTAR EL DOMINICAL?</label>
                         <select name="descontar_dominical" id="descontar_dominical" required>
                             <option value="">Selecciona la respuesta</option>
                             <option value="SI">SI</option>
@@ -200,7 +210,7 @@
                 </div>
 
                 <div class="form-field">
-                    <label for="observacion_novedad" class="required" id="label-observacion"><?php echo count($sedes) === 1 ? '10' : '11'; ?>. OBSERVACIÓN SOBRE LA NOVEDAD</label>
+                    <label for="observacion_novedad" class="required" id="label-observacion"><?php echo count($sedes) === 1 ? '11' : '12'; ?>. OBSERVACIÓN SOBRE LA NOVEDAD</label>
                     <select name="observacion_novedad" id="observacion_novedad" required>
                         <option value="">Selecciona la respuesta</option>
                         <option value="ENFERMEDAD GENERAL">ENFERMEDAD GENERAL</option>
@@ -228,7 +238,7 @@
                 </div>
 
                 <div class="form-field" style="margin-top: 1.5rem;">
-                    <label for="observaciones" id="label-nota"><?php echo count($sedes) === 1 ? '11' : '12'; ?>. OBSERVACIONES</label>
+                    <label for="observaciones" id="label-nota"><?php echo count($sedes) === 1 ? '12' : '13'; ?>. OBSERVACIONES</label>
                     <textarea id="observaciones" name="observaciones" rows="4" placeholder="Escriba su respuesta (opcional)"></textarea>
                 </div>
             </div>
@@ -295,11 +305,11 @@ function handleJustificacionChange() {
         
         // Ajustar numeración (sin documentación ni dominical)
         if (tieneSoloUnaSede) {
-            labelObservacion.innerHTML = '8. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
-            labelNota.innerHTML = '9. OBSERVACIONES';
-        } else {
             labelObservacion.innerHTML = '9. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
             labelNota.innerHTML = '10. OBSERVACIONES';
+        } else {
+            labelObservacion.innerHTML = '10. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
+            labelNota.innerHTML = '11. OBSERVACIONES';
         }
     } else {
         // Si justificación es SI, mostrar todos los campos
@@ -312,11 +322,11 @@ function handleJustificacionChange() {
         
         // Ajustar numeración (con documentación y dominical)
         if (tieneSoloUnaSede) {
-            labelObservacion.innerHTML = '10. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
-            labelNota.innerHTML = '11. OBSERVACIONES';
-        } else {
             labelObservacion.innerHTML = '11. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
             labelNota.innerHTML = '12. OBSERVACIONES';
+        } else {
+            labelObservacion.innerHTML = '12. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
+            labelNota.innerHTML = '13. OBSERVACIONES';
         }
     }
 }
@@ -414,6 +424,65 @@ function agregarEventoEliminar(btn) {
         mostrarPrevisualizacion();
     });
 }
+
+// ===== FILTRADO DINÁMICO DE ÁREAS POR SEDE (solo si hay múltiples opciones) =====
+<?php if (count($sedes) > 1 && count($areas) > 1): ?>
+const sedeAreaMap = <?php 
+    // Crear mapeo de sede -> áreas desde PHP
+    $sedeAreaMap = [];
+    foreach ($areas as $area) {
+        if (!empty($area['sede_id'])) {
+            // Buscar el nombre de la sede
+            foreach ($sedes as $sede) {
+                if ($sede['id'] == $area['sede_id']) {
+                    if (!isset($sedeAreaMap[$sede['nombre']])) {
+                        $sedeAreaMap[$sede['nombre']] = [];
+                    }
+                    $sedeAreaMap[$sede['nombre']][] = $area['nombre'];
+                    break;
+                }
+            }
+        }
+    }
+    echo json_encode($sedeAreaMap);
+?>;
+
+const sedeSelect = document.querySelector('select[name="sede"]');
+const areaSelect = document.querySelector('select[name="area_trabajo"]');
+
+if (sedeSelect && areaSelect) {
+    // Guardar todas las opciones de área originales
+    const todasLasAreas = Array.from(areaSelect.options).filter(opt => opt.value !== '');
+    
+    sedeSelect.addEventListener('change', function() {
+        const sedeSeleccionada = this.value;
+        
+        // Limpiar opciones de área
+        areaSelect.innerHTML = '<option value="">Selecciona el área</option>';
+        
+        if (sedeSeleccionada === '') {
+            // Si no hay sede seleccionada, mostrar todas las áreas
+            todasLasAreas.forEach(option => {
+                areaSelect.appendChild(option.cloneNode(true));
+            });
+        } else {
+            // Mostrar solo las áreas de la sede seleccionada
+            const areasDeEstaSede = sedeAreaMap[sedeSeleccionada] || [];
+            
+            todasLasAreas.forEach(option => {
+                if (areasDeEstaSede.includes(option.value)) {
+                    areaSelect.appendChild(option.cloneNode(true));
+                }
+            });
+            
+            // Si solo hay una área, seleccionarla automáticamente
+            if (areaSelect.options.length === 2) {
+                areaSelect.selectedIndex = 1;
+            }
+        }
+    });
+}
+<?php endif; ?>
 </script>
 
 <?php require_once APP_PATH . '/Views/layouts/footer.php'; ?>
