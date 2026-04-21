@@ -196,11 +196,11 @@ class Novedad {
     public function create($data) {
         $sql = "INSERT INTO novedades (
             nombres_apellidos, numero_cedula, sede, zona_geografica, area_trabajo,
-            fecha_novedad, turno, novedad, justificacion, es_correccion,
+            fecha_novedad, turno, novedad, justificacion, es_correccion, motivo_correccion,
             descontar_dominical, observacion_novedad, nota, responsable
         ) VALUES (
             :nombres_apellidos, :numero_cedula, :sede, :zona_geografica, :area_trabajo,
-            :fecha_novedad, :turno, :novedad, :justificacion, :es_correccion,
+            :fecha_novedad, :turno, :novedad, :justificacion, :es_correccion, :motivo_correccion,
             :descontar_dominical, :observacion_novedad, :nota, :responsable
         )";
 
@@ -217,6 +217,7 @@ class Novedad {
             ':novedad'            => $data['novedad'],
             ':justificacion'      => $data['justificacion'],
             ':es_correccion'      => $data['es_correccion'],
+            ':motivo_correccion'  => $data['motivo_correccion'] ?? null,
             ':descontar_dominical'=> $data['descontar_dominical'],
             ':observacion_novedad'=> $data['observacion_novedad'],
             ':nota'               => $data['nota'] ?? null,

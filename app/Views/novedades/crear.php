@@ -190,11 +190,19 @@
                 <div class="form-row">
                     <div class="form-field">
                         <label for="es_correccion" class="required"><?php echo count($sedes) === 1 ? '9' : '10'; ?>. ¿ES CORRECCIÓN DE UNA NOVEDAD YA REPORTADA?</label>
-                        <select name="es_correccion" id="es_correccion" required>
+                        <select name="es_correccion" id="es_correccion" required onchange="toggleMotivoCorreccion()">
                             <option value="">Selecciona la respuesta</option>
                             <option value="SI">SI</option>
                             <option value="NO">NO</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- Campo condicional: Motivo de corrección -->
+                <div class="form-row" id="motivo-correccion-container" style="display: none;">
+                    <div class="form-field">
+                        <label for="motivo_correccion" class="required" id="label-motivo-correccion"><?php echo count($sedes) === 1 ? '10' : '11'; ?>. ¿A QUÉ SE DEBE LA CORRECCIÓN?</label>
+                        <textarea id="motivo_correccion" name="motivo_correccion" rows="3" placeholder="Explica el motivo de la corrección..."></textarea>
                     </div>
                 </div>
 
@@ -328,6 +336,69 @@ function handleJustificacionChange() {
             labelObservacion.innerHTML = '12. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
             labelNota.innerHTML = '13. OBSERVACIONES';
         }
+    }
+}
+
+// Manejar cambio de corrección
+function toggleMotivoCorreccion() {
+    const esCorreccionSelect = document.getElementById('es_correccion');
+    const motivoCorreccionContainer = document.getElementById('motivo-correccion-container');
+    const motivoCorreccionTextarea = document.getElementById('motivo_correccion');
+    const descontarDominicalContainer = document.getElementById('descontar-dominical-container');
+    const labelDescontarDominical = descontarDominicalContainer.querySelector('label');
+    const labelObservacion = document.getElementById('label-observacion');
+    const labelNota = document.getElementById('label-nota');
+    const labelMotivoCorreccion = document.getElementById('label-motivo-correccion');
+    
+    // Determinar si hay 1 sede o múltiples
+    const sedeInput = document.getElementById('sede');
+    const tieneSoloUnaSede = sedeInput && sedeInput.type === 'hidden';
+    
+    // Verificar si hay justificación y documentación visible
+    const documentacionSection = document.getElementById('documentacion-section');
+    const tieneDocumentacion = documentacionSection.style.display !== 'none';
+    
+    if (esCorreccionSelect.value === 'SI') {
+        // Mostrar campo de motivo
+        motivoCorreccionContainer.style.display = 'block';
+        motivoCorreccionTextarea.setAttribute('required', 'required');
+        
+        // Ajustar numeración
+        if (tieneSoloUnaSede) {
+            if (tieneDocumentacion) {
+                // Con documentación: 9-corrección, 10-motivo, 11-dominical, 12-observación, 13-nota
+                labelMotivoCorreccion.innerHTML = '10. ¿A QUÉ SE DEBE LA CORRECCIÓN? <span style="color: #ef4444;">*</span>';
+                labelDescontarDominical.innerHTML = '11. ¿SE DEBERÍA CONSIDERAR DESCONTAR EL DOMINICAL? <span style="color: #ef4444;">*</span>';
+                labelObservacion.innerHTML = '12. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
+                labelNota.innerHTML = '13. OBSERVACIONES';
+            } else {
+                // Sin documentación: 9-corrección, 10-motivo, 11-observación, 12-nota
+                labelMotivoCorreccion.innerHTML = '10. ¿A QUÉ SE DEBE LA CORRECCIÓN? <span style="color: #ef4444;">*</span>';
+                labelObservacion.innerHTML = '11. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
+                labelNota.innerHTML = '12. OBSERVACIONES';
+            }
+        } else {
+            if (tieneDocumentacion) {
+                // Con documentación: 10-corrección, 11-motivo, 12-dominical, 13-observación, 14-nota
+                labelMotivoCorreccion.innerHTML = '11. ¿A QUÉ SE DEBE LA CORRECCIÓN? <span style="color: #ef4444;">*</span>';
+                labelDescontarDominical.innerHTML = '12. ¿SE DEBERÍA CONSIDERAR DESCONTAR EL DOMINICAL? <span style="color: #ef4444;">*</span>';
+                labelObservacion.innerHTML = '13. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
+                labelNota.innerHTML = '14. OBSERVACIONES';
+            } else {
+                // Sin documentación: 10-corrección, 11-motivo, 12-observación, 13-nota
+                labelMotivoCorreccion.innerHTML = '11. ¿A QUÉ SE DEBE LA CORRECCIÓN? <span style="color: #ef4444;">*</span>';
+                labelObservacion.innerHTML = '12. OBSERVACIÓN SOBRE LA NOVEDAD <span style="color: #ef4444;">*</span>';
+                labelNota.innerHTML = '13. OBSERVACIONES';
+            }
+        }
+    } else {
+        // Ocultar campo de motivo
+        motivoCorreccionContainer.style.display = 'none';
+        motivoCorreccionTextarea.removeAttribute('required');
+        motivoCorreccionTextarea.value = '';
+        
+        // Restaurar numeración original (se maneja en handleJustificacionChange)
+        handleJustificacionChange();
     }
 }
 

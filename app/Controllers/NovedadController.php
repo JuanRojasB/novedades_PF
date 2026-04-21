@@ -284,6 +284,17 @@ class NovedadController extends Controller {
             // Campo opcional: nota (el form usa name="observaciones")
             $datos['nota'] = !empty($_POST['observaciones']) ? htmlspecialchars($_POST['observaciones']) : null;
             
+            // Campo condicional: motivo_correccion (requerido si es_correccion = 'SI')
+            if (!empty($datos['es_correccion']) && $datos['es_correccion'] === 'SI') {
+                if (empty($_POST['motivo_correccion'])) {
+                    $errores[] = "El motivo de la corrección es obligatorio cuando se marca como corrección.";
+                } else {
+                    $datos['motivo_correccion'] = htmlspecialchars($_POST['motivo_correccion']);
+                }
+            } else {
+                $datos['motivo_correccion'] = null;
+            }
+            
             // Agregar el responsable automáticamente (nombre del usuario logueado)
             $user = $this->getUser();
             $datos['responsable'] = $user['nombre'];
