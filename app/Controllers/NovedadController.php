@@ -296,12 +296,14 @@ class NovedadController extends Controller {
                 }
                 
                 // Enviar correo de notificación (temporal a innovacion para pruebas)
+                $correoEnviado = false;
                 try {
                     require_once APP_PATH . '/Helpers/MailHelper.php';
                     $mailer = new \MailHelper();
                     
                     // TEMPORAL: Enviar siempre a innovacion para pruebas
                     $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                    $correoEnviado = true;
                     
                     /* PRODUCCIÓN: Descomentar esto cuando esté listo
                     // Obtener el correo del usuario logueado
@@ -322,7 +324,12 @@ class NovedadController extends Controller {
                     // No interrumpir el flujo si falla el correo
                 }
                 
-                $_SESSION['success'] = 'Novedad registrada exitosamente';
+                // Mensaje de éxito (siempre se muestra, aunque falle el correo)
+                if ($correoEnviado) {
+                    $_SESSION['success'] = '✅ Formulario enviado correctamente. Se ha enviado una notificación por correo.';
+                } else {
+                    $_SESSION['success'] = '✅ Formulario enviado correctamente. (Nota: El correo no pudo ser enviado, pero la novedad fue registrada)';
+                }
                 
                 // Johanna va al listado, usuarios normales vuelven al formulario
                 if (strtolower($user['nombre']) === 'johanna') {

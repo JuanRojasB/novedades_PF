@@ -35,6 +35,14 @@
         <?php unset($_SESSION['errors']); ?>
     <?php endif; ?>
 
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <strong><?php echo $_SESSION['success']; ?></strong>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
     <div class="form-container">
         <form action="<?php echo base_url('novedades/guardar'); ?>" method="POST" enctype="multipart/form-data" class="modern-form">
             <!-- Información Personal -->
