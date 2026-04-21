@@ -18,7 +18,7 @@ El sistema tiene dos niveles de acceso:
 ✅ Ver todas las sedes y áreas  
 
 **Menú visible:**
-- Ver Novedades (dashboard con listado completo)
+- Dashboard (dashboard con listado completo)
 - Estadísticas (gráficos y análisis)
 - Administración
 
@@ -129,7 +129,7 @@ if (strtolower($user['nombre']) === 'johanna') {
 
 ## Resumen de Accesos
 
-### Dashboard (Ver Novedades)
+### Dashboard (Dashboard)
 **Solo Johanna tiene acceso**
 
 Incluye:
@@ -161,8 +161,8 @@ Incluye:
 ## Cambios Implementados
 
 ### 1. Navbar (Menú)
-- **Antes:** Todos veían "Ver Novedades"
-- **Ahora:** Solo Johanna ve "Ver Novedades", "Estadísticas", "Administración"
+- **Antes:** Todos veían "Dashboard"
+- **Ahora:** Solo Johanna ve "Dashboard", "Estadísticas", "Administración"
 
 ### 2. Controlador NovedadController::index()
 - **Antes:** Filtraba novedades por responsable para usuarios normales

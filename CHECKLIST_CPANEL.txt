@@ -44,7 +44,7 @@
   [ ] Login funciona
   [ ] Crear novedad funciona
   [ ] Subir archivos funciona
-  [ ] Ver novedades funciona
+  [ ] Dashboard funciona
   [ ] Estadísticas funciona (usuario Johanna)
 
 📧 CORREO (OPCIONAL):

@@ -53,7 +53,7 @@ class NovedadController extends Controller {
         $areaModel = new \Models\AreaTrabajo();
         
         $data = [
-            'title' => 'Novedades',
+            'title' => 'Dashboard',
             'user' => $user,
             'novedades' => $novedades,
             'totalNovedades' => $totalNovedades,

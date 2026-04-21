@@ -32,7 +32,7 @@ http://localhost/informe-novedades/public/
 
 **Comportamiento esperado:**
 1. ✅ Redirige automáticamente al formulario de crear novedad
-2. ✅ NO ve menú de "Ver Novedades"
+2. ✅ NO ve menú de "Dashboard"
 3. ✅ Solo ve su sede y área asignada (1 opción cada uno)
 4. ✅ Llena el formulario y guarda
 5. ✅ Recibe mensaje "Novedad registrada exitosamente"
@@ -55,7 +55,7 @@ WHERE usuario = 'admin';
 
 **Comportamiento esperado:**
 1. ✅ Ve el listado completo de novedades
-2. ✅ Ve menú completo: "Ver Novedades", "Estadísticas", "Administración"
+2. ✅ Ve menú completo: "Dashboard", "Estadísticas", "Administración"
 3. ✅ Puede filtrar, buscar, ordenar novedades
 4. ✅ Puede crear novedades para cualquier sede/área
 5. ✅ Después de guardar, va al listado (no al formulario)
@@ -108,7 +108,7 @@ WHERE usuario = 'admin';
 
 ## Verificaciones en Base de Datos
 
-### Ver novedades creadas:
+### Dashboard creadas:
 ```sql
 SELECT id, nombres_apellidos, sede, area_trabajo, novedad, responsable, created_at
 FROM novedades

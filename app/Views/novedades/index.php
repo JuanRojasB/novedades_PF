@@ -9,7 +9,7 @@
     <!-- Header -->
     <div class="page-header">
         <div>
-            <h1>Novedades Registradas</h1>
+            <h1>Dashboard</h1>
             <span class="total-badge"><?php echo count($novedades); ?> registros</span>
         </div>
         <a href="<?php echo base_url('novedades/crear'); ?>" class="btn-primary">+ Nueva Novedad</a>

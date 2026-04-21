@@ -217,7 +217,7 @@ Ejemplo: `https://novedades.tudominio.com/`
    O el usuario que hayas creado en la base de datos
 
 4. **Probar funcionalidades**:
-   - Ver novedades
+   - Dashboard
    - Crear nueva novedad
    - Subir archivos
    - Ver estadísticas (si eres Johanna)

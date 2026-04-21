@@ -55,7 +55,7 @@ Después de iniciar sesión, debes ver:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Ver Novedades  |  Estadísticas  |  Administración  │
+│  Dashboard  |  Estadísticas  |  Administración  │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -103,7 +103,7 @@ console.log(document.querySelector('.nav-center').innerHTML);
 
 **Si ves enlaces:**
 ```html
-<a href="...">Ver Novedades</a>
+<a href="...">Dashboard</a>
 <a href="...">Estadísticas</a>
 <a href="...">Administración</a>
 ```
@@ -135,9 +135,9 @@ C:\xampp\mysql\bin\mysql.exe -u root pollo_fiesta_novedades -e "SELECT usuario, 
 - [ ] Cerré sesión en el sistema
 - [ ] Limpié cookies del navegador (opcional)
 - [ ] Inicié sesión nuevamente como `admin` / `admin123`
-- [ ] Veo el menú completo: Ver Novedades | Estadísticas | Administración
+- [ ] Veo el menú completo: Dashboard | Estadísticas | Administración
 - [ ] Puedo acceder a Estadísticas
-- [ ] Puedo acceder a Ver Novedades (dashboard)
+- [ ] Puedo acceder a Dashboard (dashboard)
 
 ## Explicación Técnica
 

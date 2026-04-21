@@ -41,9 +41,9 @@ Al seleccionar archivos:
 
 El responsable se registra automáticamente como el usuario que está logueado (no necesitas escribirlo).
 
-## Ver Novedades Registradas
+## Dashboard
 
-1. Haz clic en "Ver Novedades" en el formulario
+1. Haz clic en "Dashboard" en el formulario
 2. Verás una tabla con todas las novedades registradas
 
 ### Filtros Disponibles

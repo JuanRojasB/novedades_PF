@@ -23,11 +23,11 @@ Después de iniciar sesión, Johanna debe ver:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Ver Novedades  |  Estadísticas  |  Administración  │
+│  Dashboard  |  Estadísticas  |  Administración  │
 └─────────────────────────────────────────────────────┘
 ```
 
-### 3. Ver Novedades (Dashboard)
+### 3. Dashboard (Dashboard)
 
 **Ruta:** `/novedades`
 
@@ -40,7 +40,7 @@ Johanna debe ver:
 - ✅ Estadísticas resumidas en cards
 
 **Probar:**
-1. Click en "Ver Novedades"
+1. Click en "Dashboard"
 2. Verificar que aparece el dashboard completo
 3. Probar filtros
 4. Probar búsqueda
@@ -97,7 +97,7 @@ Johanna debe tener acceso completo.
 ### Johanna (admin)
 ```
 Login → Dashboard con listado completo
-Menú: Ver Novedades | Estadísticas | Administración
+Menú: Dashboard | Estadísticas | Administración
 Sedes: TODAS
 Áreas: TODAS
 Después de guardar: Va al listado
@@ -163,7 +163,7 @@ if (strtolower($user['nombre']) !== 'johanna') {
 
 // En navbar.php
 <?php if (strtolower($_SESSION['user']['nombre']) === 'johanna'): ?>
-    <a href="...">Ver Novedades</a>
+    <a href="...">Dashboard</a>
     <a href="...">Estadísticas</a>
     <a href="...">Administración</a>
 <?php endif; ?>
@@ -208,7 +208,7 @@ WHERE nombre = 'Johanna';
 ## Checklist de Pruebas
 
 - [ ] Login como Johanna funciona
-- [ ] Johanna ve menú completo (Ver Novedades, Estadísticas, Administración)
+- [ ] Johanna ve menú completo (Dashboard, Estadísticas, Administración)
 - [ ] Johanna ve dashboard con listado completo
 - [ ] Johanna puede filtrar y buscar novedades
 - [ ] Johanna puede ordenar columnas

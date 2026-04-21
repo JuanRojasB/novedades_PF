@@ -14,7 +14,7 @@
         <div class="nav-menu" id="navMenu">
             <div class="nav-center">
                 <?php if (isset($_SESSION['user']) && stripos($_SESSION['user']['nombre'], 'johanna') !== false): ?>
-                    <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
+                    <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Dashboard</a>
                     <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
                     <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
                     <?php if ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false): ?>
