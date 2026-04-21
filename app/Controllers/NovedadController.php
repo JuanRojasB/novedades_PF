@@ -79,109 +79,145 @@ class NovedadController extends Controller {
             $sedesDisponibles = [];
             $areasDisponibles = [];
             
-            // Si NO es Johanna, restringir a una sola sede y área
+            // Si NO es Johanna, restringir según configuración
             if (stripos($user['nombre'], 'johanna') === false) {
-                // Mapeo completo de usuarios a sedes y áreas (usando nombres exactos de la BD)
-                $asignaciones = [
-                    // GERENTES
-                    'hbenito' => ['sede' => 'Administrativo', 'area' => 'Asesores Comerciales S3'],
-                    'hfajardo' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
-                    'agarcia' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'jrestrepo' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
-                    'mroa' => ['sede' => 'Administrativo', 'area' => 'Publicidad'],
-                    'mroa2' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'erodriguez' => ['sede' => 'Administrativo', 'area' => 'Asesores Comerciales S1'],
-                    'drodriguez' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
-                    'ksanchez' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
-                    'osolano' => ['sede' => 'Administrativo', 'area' => 'Contabilidad'],
-                    
-                    // DIRECTORES
-                    'marias' => ['sede' => 'Puntos de Venta', 'area' => '20 de Julio'],
-                    'acardenas' => ['sede' => 'Sede 3', 'area' => 'Posproceso'],
-                    'ediaz' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
-                    'bferro' => ['sede' => 'Administrativo', 'area' => 'Compras'],
-                    'egonzalez' => ['sede' => 'Puntos de Venta', 'area' => 'Abastos'],
-                    'jibanez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'ymora' => ['sede' => 'Yopal', 'area' => 'Yopal PDV'],
-                    'lmurillo' => ['sede' => 'Administrativo', 'area' => 'Cartera'],
-                    'mnino' => ['sede' => 'Administrativo', 'area' => 'Publicidad'],
-                    'jrios' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
-                    'rrodriguez' => ['sede' => 'Planta', 'area' => 'Planta de Beneficio'],
-                    'krodriguez' => ['sede' => 'Planta', 'area' => 'Planta de Beneficio'],
-                    'jsanchez' => ['sede' => 'Administrativo', 'area' => 'Contabilidad'],
-                    'gzubieta' => ['sede' => 'Administrativo', 'area' => 'Auditoría'],
-                    'msanchez' => ['sede' => 'Administrativo', 'area' => 'Sistemas'],
-                    'amartinez' => ['sede' => 'Administrativo', 'area' => 'SAGRILAFT'],
-                    
-                    // JEFES
-                    'yalvarado' => ['sede' => 'Toberin', 'area' => 'Toberin'],
-                    'calfonso' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
-                    'langulo' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
-                    'lardila' => ['sede' => 'Yopal', 'area' => 'Yopal Bodega'],
-                    'sarevalo' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
-                    'wbernate' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
-                    'tcabana' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
-                    'hcampos' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
-                    'jcastro' => ['sede' => 'Sede 1', 'area' => 'Despachos'],
-                    'cfontalvo' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
-                    'gmarin' => ['sede' => 'Huevos', 'area' => 'Huevos'],
-                    'ymontenegro' => ['sede' => 'Administrativo', 'area' => 'Tesorería'],
-                    'aperez' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
-                    'cpuentes' => ['sede' => 'Sede 3', 'area' => 'Despachos'],
-                    'jrodriguez2' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'drodriguez2' => ['sede' => 'Granjas', 'area' => 'Procesados'],
-                    'eromero' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
-                    'cruiz' => ['sede' => 'Sede 2', 'area' => 'Despachos'],
-                    'jurrego' => ['sede' => 'Sede 3', 'area' => 'Despachos'],
-                    
-                    // PROFESIONALES
-                    'davila' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
-                    'nbernal' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'mgil' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
-                    'egomez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'agonzalez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'bguerrero' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'aibarra' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'hjimenez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'njimenez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'dlinares' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
-                    'mmartinez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'fmonsalve' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'jortiz' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'jotero' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'jpacheco' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'kparra' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
-                    'cpulido' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'nrodriguez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    'rrodriguez2' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
-                    'jtirado' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'svanegas' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
-                    'nvivas' => ['sede' => 'Granjas', 'area' => 'Granjas'],
-                    
-                    // Usuarios de prueba
-                    'jefe_admin' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
-                    'jefe_yopal' => ['sede' => 'Yopal', 'area' => 'Yopal Bodega'],
-                    'jefe_pdv' => ['sede' => 'Puntos de Venta', 'area' => '20 de Julio'],
-                    'usuario' => ['sede' => 'Administrativo', 'area' => 'Sistemas'],
-                    'admin' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                
+                // Jefes con acceso a múltiples sedes/áreas (basado en datos históricos)
+                $jefesMultiples = [
+                    'fperez' => ['sedes' => ['Sede 1', 'Sede 2', 'Sede 3'], 'areas' => ['Posproceso']],
+                    'aforero' => ['sedes' => ['Sede 2', 'Sede 3'], 'areas' => ['Planta de Beneficio']],
+                    'eparra' => ['sedes' => ['Sede 1', 'Sede 2', 'Sede 3'], 'areas' => ['Posproceso']],
+                    'wortega' => ['sedes' => ['Sede 3'], 'areas' => ['Posproceso', 'Procesados']],
+                    'kposada' => ['sedes' => ['Sede 2', 'Sede 3'], 'areas' => ['Posproceso']],
+                    'ahortua' => ['sedes' => ['Sede 1', 'Sede 3'], 'areas' => ['Posproceso']],
+                    'lsantamaria' => ['sedes' => ['Sede 1', 'Sede 2', 'Sede 3'], 'areas' => ['Posproceso']],
+                    'jtegue' => ['sedes' => ['Sede 1', 'Sede 3'], 'areas' => ['Posproceso', 'Procesados']],
+                    'wbernate' => ['sedes' => ['Sede 1', 'Sede 2'], 'areas' => ['Procesados']],
+                    'ycuaran' => ['sedes' => ['Sede 2'], 'areas' => ['Calidad', 'Limpieza y Desinfección']],
+                    'hmontealegre' => ['sedes' => ['Sede 1', 'Sede 3'], 'areas' => ['Posproceso']],
+                    'jdiaz' => ['sedes' => ['Sede 2'], 'areas' => ['Posproceso', 'Procesados']]
                 ];
                 
-                // Obtener asignación del usuario actual
-                $asignacion = $asignaciones[$user['username']] ?? null;
-                
-                if ($asignacion) {
-                    $sedeAsignada = $asignacion['sede'];
-                    $areaAsignada = $asignacion['area'];
+                // Verificar si el usuario tiene acceso múltiple
+                if (isset($jefesMultiples[$user['username']])) {
+                    $config = $jefesMultiples[$user['username']];
                     
-                    // Crear array con solo su sede y área
-                    $sedesDisponibles = [['id' => 0, 'nombre' => $sedeAsignada, 'activo' => 1]];
-                    $areasDisponibles = [['id' => 0, 'nombre' => $areaAsignada, 'activo' => 1]];
-                } else {
-                    // Si no está en el mapeo, dar acceso completo temporalmente
+                    // Cargar sedes asignadas
                     $sedeModel = new \Models\Sede();
+                    $todasLasSedes = $sedeModel->getAll();
+                    $sedesDisponibles = array_filter($todasLasSedes, function($sede) use ($config) {
+                        return in_array($sede['nombre'], $config['sedes']);
+                    });
+                    
+                    // Cargar áreas asignadas
                     $areaModel = new \Models\AreaTrabajo();
-                    $sedesDisponibles = $sedeModel->getAll();
-                    $areasDisponibles = $areaModel->getAll();
+                    $todasLasAreas = $areaModel->getAll();
+                    $areasDisponibles = array_filter($todasLasAreas, function($area) use ($config) {
+                        return in_array($area['nombre'], $config['areas']);
+                    });
+                    
+                } else {
+                    // Mapeo simple de usuarios a una sola sede y área
+                    $asignaciones = [
+                        // GERENTES
+                        'hbenito' => ['sede' => 'Administrativo', 'area' => 'Asesores Comerciales S3'],
+                        'hfajardo' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                        'agarcia' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'jrestrepo' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                        'mroa' => ['sede' => 'Administrativo', 'area' => 'Publicidad'],
+                        'mroa2' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'erodriguez' => ['sede' => 'Administrativo', 'area' => 'Asesores Comerciales S1'],
+                        'drodriguez' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
+                        'ksanchez' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                        'osolano' => ['sede' => 'Administrativo', 'area' => 'Contabilidad'],
+                        
+                        // DIRECTORES
+                        'marias' => ['sede' => 'Puntos de Venta', 'area' => '20 de Julio'],
+                        'acardenas' => ['sede' => 'Sede 3', 'area' => 'Posproceso'],
+                        'ediaz' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
+                        'bferro' => ['sede' => 'Administrativo', 'area' => 'Compras'],
+                        'egonzalez' => ['sede' => 'Puntos de Venta', 'area' => 'Abastos'],
+                        'jibanez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'ymora' => ['sede' => 'Yopal', 'area' => 'Yopal PDV'],
+                        'lmurillo' => ['sede' => 'Administrativo', 'area' => 'Cartera'],
+                        'mnino' => ['sede' => 'Administrativo', 'area' => 'Publicidad'],
+                        'jrios' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
+                        'rrodriguez' => ['sede' => 'Planta', 'area' => 'Planta de Beneficio'],
+                        'krodriguez' => ['sede' => 'Planta', 'area' => 'Planta de Beneficio'],
+                        'jsanchez' => ['sede' => 'Administrativo', 'area' => 'Contabilidad'],
+                        'gzubieta' => ['sede' => 'Administrativo', 'area' => 'Auditoría'],
+                        'msanchez' => ['sede' => 'Administrativo', 'area' => 'Sistemas'],
+                        'amartinez' => ['sede' => 'Administrativo', 'area' => 'SAGRILAFT'],
+                        
+                        // JEFES (con una sola sede/área)
+                        'yalvarado' => ['sede' => 'Toberin', 'area' => 'Toberin'],
+                        'calfonso' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                        'langulo' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
+                        'lardila' => ['sede' => 'Yopal', 'area' => 'Yopal Bodega'],
+                        'sarevalo' => ['sede' => 'Administrativo', 'area' => 'Operaciones y Mantenimiento'],
+                        'tcabana' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                        'hcampos' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                        'jcastro' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
+                        'cfontalvo' => ['sede' => 'Sede 1', 'area' => 'Posproceso'],
+                        'gmarin' => ['sede' => 'Huevos', 'area' => 'Huevos'],
+                        'ymontenegro' => ['sede' => 'Administrativo', 'area' => 'Tesorería'],
+                        'aperez' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                        'cpuentes' => ['sede' => 'Sede 3', 'area' => 'Posproceso'],
+                        'jrodriguez2' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'drodriguez2' => ['sede' => 'Granjas', 'area' => 'Procesados'],
+                        'eromero' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                        'cruiz' => ['sede' => 'Sede 2', 'area' => 'Posproceso'],
+                        'jurrego' => ['sede' => 'Sede 3', 'area' => 'Posproceso'],
+                        
+                        // PROFESIONALES
+                        'davila' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                        'nbernal' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'mgil' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
+                        'egomez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'agonzalez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'bguerrero' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'aibarra' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'hjimenez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'njimenez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'dlinares' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                        'mmartinez' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'fmonsalve' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'jortiz' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'jotero' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'jpacheco' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'kparra' => ['sede' => 'Administrativo', 'area' => 'Gestión Humana'],
+                        'cpulido' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'nrodriguez' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        'rrodriguez2' => ['sede' => 'Administrativo', 'area' => 'HSEQ'],
+                        'jtirado' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'svanegas' => ['sede' => 'Administrativo', 'area' => 'Calidad'],
+                        'nvivas' => ['sede' => 'Granjas', 'area' => 'Granjas'],
+                        
+                        // Usuarios de prueba
+                        'jefe_admin' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                        'jefe_yopal' => ['sede' => 'Yopal', 'area' => 'Yopal Bodega'],
+                        'jefe_pdv' => ['sede' => 'Puntos de Venta', 'area' => '20 de Julio'],
+                        'usuario' => ['sede' => 'Administrativo', 'area' => 'Sistemas'],
+                        'admin' => ['sede' => 'Administrativo', 'area' => 'Gerencia General'],
+                    ];
+                    
+                    // Obtener asignación del usuario actual
+                    $asignacion = $asignaciones[$user['username']] ?? null;
+                    
+                    if ($asignacion) {
+                        $sedeAsignada = $asignacion['sede'];
+                        $areaAsignada = $asignacion['area'];
+                        
+                        // Crear array con solo su sede y área
+                        $sedesDisponibles = [['id' => 0, 'nombre' => $sedeAsignada, 'activo' => 1]];
+                        $areasDisponibles = [['id' => 0, 'nombre' => $areaAsignada, 'activo' => 1]];
+                    } else {
+                        // Si no está en el mapeo, dar acceso completo temporalmente
+                        $sedeModel = new \Models\Sede();
+                        $areaModel = new \Models\AreaTrabajo();
+                        $sedesDisponibles = $sedeModel->getAll();
+                        $areasDisponibles = $areaModel->getAll();
+                    }
                 }
             } else {
                 // Johanna ve todas las sedes y áreas
