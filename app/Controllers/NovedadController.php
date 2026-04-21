@@ -295,11 +295,15 @@ class NovedadController extends Controller {
                     }
                 }
                 
-                // Enviar correo de notificación al usuario que llena el formulario
+                // Enviar correo de notificación (temporal a innovacion para pruebas)
                 try {
                     require_once APP_PATH . '/Helpers/MailHelper.php';
                     $mailer = new \MailHelper();
                     
+                    // TEMPORAL: Enviar siempre a innovacion para pruebas
+                    $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                    
+                    /* PRODUCCIÓN: Descomentar esto cuando esté listo
                     // Obtener el correo del usuario logueado
                     $usuarioModel = new \Models\Usuario();
                     $usuarioData = $usuarioModel->getByUsername($user['username']);
@@ -312,6 +316,7 @@ class NovedadController extends Controller {
                         $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
                         error_log("Usuario {$user['username']} no tiene correo configurado");
                     }
+                    */
                 } catch (\Exception $e) {
                     error_log("Error enviando correo: " . $e->getMessage());
                     // No interrumpir el flujo si falla el correo
