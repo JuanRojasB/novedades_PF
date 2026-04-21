@@ -1,59 +1,9 @@
 -- ============================================
--- SCRIPT COMPLETO PARA wwpoll_informe_novedades
--- Ejecutar DESPUÉS de importar schema.sql
+-- AGREGAR CORREOS CORPORATIVOS A USUARIOS
 -- ============================================
 
-USE wwpoll_informe_novedades;
-
--- Agregar columna de email si no existe
+-- Primero agregar columna de correo si no existe
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS email VARCHAR(100) DEFAULT NULL;
-
--- Eliminar "Producción" como sede (debe ser área de Granjas)
-DELETE FROM sedes WHERE nombre = 'Producción';
-
--- Agregar áreas faltantes para Sede 1
-SET @sede1_id = (SELECT id FROM sedes WHERE nombre = 'Sede 1');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Despachos', NULL, @sede1_id),
-('Posproceso', NULL, @sede1_id);
-
--- Agregar áreas faltantes para Sede 2
-SET @sede2_id = (SELECT id FROM sedes WHERE nombre = 'Sede 2');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Despachos', NULL, @sede2_id),
-('Posproceso', NULL, @sede2_id);
-
--- Agregar áreas faltantes para Sede 3
-SET @sede3_id = (SELECT id FROM sedes WHERE nombre = 'Sede 3');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Despachos', NULL, @sede3_id),
-('Posproceso', NULL, @sede3_id);
-
--- Agregar áreas faltantes para Planta
-SET @planta_id = (SELECT id FROM sedes WHERE nombre = 'Planta');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Planta de Beneficio', NULL, @planta_id);
-
--- Agregar áreas faltantes para Granjas (Producción y Procesados son ÁREAS, no sedes)
-SET @granjas_id = (SELECT id FROM sedes WHERE nombre = 'Granjas');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Granjas', NULL, @granjas_id),
-('Producción', NULL, @granjas_id),
-('Procesados', NULL, @granjas_id);
-
--- Agregar áreas faltantes para Huevos
-SET @huevos_id = (SELECT id FROM sedes WHERE nombre = 'Huevos');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Huevos', NULL, @huevos_id);
-
--- Agregar áreas faltantes para Toberin
-SET @toberin_id = (SELECT id FROM sedes WHERE nombre = 'Toberin');
-INSERT IGNORE INTO areas_trabajo (nombre, zona_geografica_id, sede_id) VALUES 
-('Toberin', NULL, @toberin_id);
-
--- ============================================
--- AGREGAR CORREOS CORPORATIVOS
--- ============================================
 
 -- GERENTES
 UPDATE usuarios SET email = 'gerenciacomercial3@pollo-fiesta.com' WHERE usuario = 'hbenito';
@@ -116,45 +66,28 @@ UPDATE usuarios SET email = 'javier.monsalve@pollo-fiesta.com' WHERE usuario = '
 UPDATE usuarios SET email = 'seleccionpersonal@pollo-fiesta.com' WHERE usuario = 'kparra';
 UPDATE usuarios SET email = 'profesionalsst@pollo-fiesta.com' WHERE usuario = 'rrodriguez2';
 
--- Usuarios sin correo específico - asignar correo genérico
-UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario IN ('egomez', 'agonzalez', 'bguerrero', 'aibarra', 'njimenez', 'mmartinez', 'jortiz', 'jotero', 'jpacheco', 'cpulido', 'nrodriguez', 'jtirado', 'svanegas', 'nvivas') AND (email IS NULL OR email = '');
+-- Usuarios sin correo específico - asignar correo genérico para que lo actualicen
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'egomez' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'agonzalez' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'bguerrero' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'aibarra' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'njimenez' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'mmartinez' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'jortiz' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'jotero' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'jpacheco' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'cpulido' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'nrodriguez' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'jtirado' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'svanegas' AND (email IS NULL OR email = '');
+UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'nvivas' AND (email IS NULL OR email = '');
 
 -- Usuarios de prueba
 UPDATE usuarios SET email = 'admin@pollo-fiesta.com' WHERE usuario = 'admin';
 UPDATE usuarios SET email = 'usuario@pollo-fiesta.com' WHERE usuario = 'usuario';
 UPDATE usuarios SET email = 'jefe@pollo-fiesta.com' WHERE usuario LIKE 'jefe_%';
 
--- ============================================
--- VERIFICACIÓN
--- ============================================
-
-SELECT '=== VERIFICACIÓN DE SEDES ===' AS '';
-SELECT nombre, activo FROM sedes ORDER BY nombre;
-
-SELECT '=== TOTAL DE ÁREAS POR SEDE ===' AS '';
-SELECT s.nombre AS Sede, COUNT(a.id) AS Total_Areas
-FROM sedes s
-LEFT JOIN areas_trabajo a ON s.id = a.sede_id
-GROUP BY s.id, s.nombre
-ORDER BY s.nombre;
-
-SELECT '=== ÁREAS DE GRANJAS (debe tener 3) ===' AS '';
-SELECT a.nombre AS Area
-FROM areas_trabajo a
-JOIN sedes s ON a.sede_id = s.id
-WHERE s.nombre = 'Granjas'
-ORDER BY a.nombre;
-
-SELECT '=== USUARIOS DEL SISTEMA ===' AS '';
-SELECT id, usuario, nombre, rol, activo FROM usuarios ORDER BY nombre;
-
-SELECT '=== TIPOS DE NOVEDAD ===' AS '';
-SELECT nombre FROM tipos_novedad WHERE activo = 1 ORDER BY nombre;
-
--- ============================================
--- RESULTADO ESPERADO:
--- - 12 sedes (sin "Producción")
--- - 44 áreas en total
--- - Granjas con 3 áreas: Granjas, Procesados, Producción
--- - Al menos 1 usuario activo
--- ============================================
+-- Verificar
+SELECT usuario, nombre, email, rol 
+FROM usuarios 
+ORDER BY rol, nombre;

@@ -11,8 +11,16 @@ class NovedadController extends Controller {
     public function index() {
         $this->requireAuth();
         
-        $novedadModel = new Novedad();
         $user = $this->getUser();
+        
+        // Solo Johanna puede ver el listado de novedades
+        if (strtolower($user['nombre']) !== 'johanna') {
+            // Usuarios normales van directo al formulario
+            $this->redirect('novedades/crear');
+            return;
+        }
+        
+        $novedadModel = new Novedad();
         $usuarioModel = new \Models\Usuario();
         
         // Obtener filtros de la URL
@@ -23,28 +31,13 @@ class NovedadController extends Controller {
             'fecha_hasta' => $_GET['fecha_hasta'] ?? ''
         ];
         
-        // Si NO es Johanna, solo mostrar sus propias novedades
-        if (strtolower($user['nombre']) !== 'johanna') {
-            $filters['responsable'] = $user['nombre'];
-        }
-        
-        // Si es jefe, filtrar solo por sus sedes
-        if ($user['rol'] === 'jefe') {
-            $sedesAsignadas = $usuarioModel->getSedesAsignadas($user['id']);
-            $sedesNombres = array_column($sedesAsignadas, 'nombre');
-            $filters['sedes_permitidas'] = $sedesNombres;
-        }
-        
+        // Johanna ve todas las novedades
         $novedades = $novedadModel->getAll($filters);
         $estadisticas = $novedadModel->getEstadisticasPorZona();
         
         // Cargar catálogos para los filtros
-        if ($user['rol'] === 'jefe') {
-            $sedesDisponibles = $usuarioModel->getSedesAsignadas($user['id']);
-        } else {
-            $sedeModel = new \Models\Sede();
-            $sedesDisponibles = $sedeModel->getAll();
-        }
+        $sedeModel = new \Models\Sede();
+        $sedesDisponibles = $sedeModel->getAll();
         
         $areaModel = new \Models\AreaTrabajo();
         
@@ -302,19 +295,36 @@ class NovedadController extends Controller {
                     }
                 }
                 
-                // Enviar correo de notificación
+                // Enviar correo de notificación al usuario que llena el formulario
                 try {
                     require_once APP_PATH . '/Helpers/MailHelper.php';
                     $mailer = new \MailHelper();
-                    // Correo al área de Gestión Humana
-                    $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                    
+                    // Obtener el correo del usuario logueado
+                    $usuarioModel = new \Models\Usuario();
+                    $usuarioData = $usuarioModel->getByUsername($user['username']);
+                    
+                    if ($usuarioData && !empty($usuarioData['email'])) {
+                        // Enviar al correo del usuario
+                        $mailer->enviarNovedad($datos, $usuarioData['email']);
+                    } else {
+                        // Si no tiene correo, enviar a correo genérico
+                        $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                        error_log("Usuario {$user['username']} no tiene correo configurado");
+                    }
                 } catch (\Exception $e) {
                     error_log("Error enviando correo: " . $e->getMessage());
                     // No interrumpir el flujo si falla el correo
                 }
                 
                 $_SESSION['success'] = 'Novedad registrada exitosamente';
-                $this->redirect('novedades');
+                
+                // Johanna va al listado, usuarios normales vuelven al formulario
+                if (strtolower($user['nombre']) === 'johanna') {
+                    $this->redirect('novedades');
+                } else {
+                    $this->redirect('novedades/crear');
+                }
             } else {
                 $errores[] = "Error al guardar la novedad en la base de datos.";
                 $_SESSION['errors'] = $errores;

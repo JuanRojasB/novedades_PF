@@ -13,8 +13,8 @@
         
         <div class="nav-menu" id="navMenu">
             <div class="nav-center">
-                <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
                 <?php if (isset($_SESSION['user']) && strtolower($_SESSION['user']['nombre']) === 'johanna'): ?>
+                    <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Ver Novedades</a>
                     <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
                     <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
                 <?php endif; ?>
