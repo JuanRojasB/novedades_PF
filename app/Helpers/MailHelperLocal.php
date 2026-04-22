@@ -70,6 +70,15 @@ class MailHelperLocal {
               </tr>';
         }
 
+        // Agregar fila de motivo de corrección si es corrección
+        $filaMotivo = '';
+        if (isset($n['es_correccion']) && $n['es_correccion'] === 'SI' && !empty($n['motivo_correccion'])) {
+            $filaMotivo = '<tr>
+                <td style="border:1px solid #e2e8f0;font-weight:600;color:#334155;">Motivo de Corrección</td>
+                <td style="border:1px solid #e2e8f0;color:#1e293b;">' . htmlspecialchars($n['motivo_correccion']) . '</td>
+              </tr>';
+        }
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="es">
@@ -126,6 +135,7 @@ class MailHelperLocal {
                 <td style="border:1px solid #e2e8f0;font-weight:600;color:#334155;">Justificación</td>
                 <td style="border:1px solid #e2e8f0;">{$just}</td>
               </tr>
+              {$filaMotivo}
               <tr style="background:#f8fafc;">
                 <td style="border:1px solid #e2e8f0;font-weight:600;color:#334155;">Observación</td>
                 <td style="border:1px solid #e2e8f0;color:#1e293b;">{$n['observacion_novedad']}</td>
