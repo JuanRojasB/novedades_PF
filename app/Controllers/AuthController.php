@@ -25,7 +25,7 @@ class AuthController extends Controller {
             if ($user && password_verify($password, $user['password'])) {
                 $_SESSION['user'] = [
                     'id'       => $user['id'],
-                    'username' => $user['usuario'],
+                    'usuario'  => $user['usuario'],
                     'nombre'   => $user['nombre'],
                     'cargo'    => $user['cargo'] ?? '',
                     'rol'      => $user['rol'],

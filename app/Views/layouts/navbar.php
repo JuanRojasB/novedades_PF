@@ -13,12 +13,25 @@
         
         <div class="nav-menu" id="navMenu">
             <div class="nav-center">
-                <?php if (isset($_SESSION['user']) && stripos($_SESSION['user']['nombre'], 'johanna') !== false): ?>
+                <?php 
+                // Usuarios con acceso al dashboard: Johanna + 4 de Gestión Humana
+                $usuariosConDashboard = ['johanna', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+                $tieneAccesoDashboard = false;
+                
+                if (isset($_SESSION['user'])) {
+                    foreach ($usuariosConDashboard as $userPermitido) {
+                        if (stripos($_SESSION['user']['nombre'], $userPermitido) !== false || $_SESSION['user']['usuario'] === $userPermitido) {
+                            $tieneAccesoDashboard = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if ($tieneAccesoDashboard): ?>
                     <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Dashboard</a>
                     <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
-                    <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
-                    <?php if ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false): ?>
-                        <a href="/informe-novedades/public/ver_correos_simulados.php" class="nav-link" style="background: rgba(255, 255, 255, 0.15);">📧 Correos Dev</a>
+                    <?php if (stripos($_SESSION['user']['nombre'], 'johanna') !== false): ?>
+                        <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>

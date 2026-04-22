@@ -18,7 +18,7 @@ class NovedadController extends Controller {
         $tieneAccesoDashboard = false;
         
         foreach ($usuariosConDashboard as $userPermitido) {
-            if (stripos($user['nombre'], $userPermitido) !== false || $user['username'] === $userPermitido) {
+            if (stripos($user['nombre'], $userPermitido) !== false || $user['usuario'] === $userPermitido) {
                 $tieneAccesoDashboard = true;
                 break;
             }
@@ -109,8 +109,8 @@ class NovedadController extends Controller {
                 ];
                 
                 // Verificar si el usuario tiene acceso múltiple
-                if (isset($jefesMultiples[$user['username']])) {
-                    $config = $jefesMultiples[$user['username']];
+                if (isset($jefesMultiples[$user['usuario']])) {
+                    $config = $jefesMultiples[$user['usuario']];
                     
                     // Cargar sedes asignadas
                     $sedeModel = new \Models\Sede();
@@ -212,7 +212,7 @@ class NovedadController extends Controller {
                     ];
                     
                     // Obtener asignación del usuario actual
-                    $asignacion = $asignaciones[$user['username']] ?? null;
+                    $asignacion = $asignaciones[$user['usuario']] ?? null;
                     
                     if ($asignacion) {
                         $sedeAsignada = $asignacion['sede'];
@@ -374,24 +374,37 @@ class NovedadController extends Controller {
                     // Agregar el ID a los datos para el correo
                     $datos['id'] = $novedad_id;
                     
-                    // Correos de Gestión Humana que deben recibir TODAS las novedades
-                    $correosGestionHumana = [
+                    // Correos que deben recibir TODAS las novedades (5 usuarios)
+                    $correosDestino = [
                         'r.humanos@pollo-fiesta.com',           // ELSA BECERRA
                         'AuxiliarGH2@pollo-fiesta.com',         // CATHERINE ORTIZ
                         'AuxiliarGH1@pollo-fiesta.com',         // CARMENZA MARTINEZ
-                        'profesionalnomina@pollo-fiesta.com'    // MICHELLE VELANDIA
+                        'profesionalnomina@pollo-fiesta.com',   // MICHELLE VELANDIA
+                        'innovacion@pollo-fiesta.com'           // JOHANNA
                     ];
+                    
+                    // MODO PRUEBA: Enviar todos los correos a pasantesistemas1@pollo-fiesta.com
+                    $modoPrueba = true; // Cambiar a false en producción
+                    $correoPrueba = 'pasantesistemas1@pollo-fiesta.com';
                     
                     // DESARROLLO LOCAL: Usar simulador de correo
                     if ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) {
                         require_once APP_PATH . '/Helpers/MailHelperLocal.php';
                         $mailer = new \MailHelperLocal();
                         
-                        // Enviar a cada usuario de Gestión Humana
-                        foreach ($correosGestionHumana as $correo) {
-                            if ($mailer->enviarNovedad($datos, $correo)) {
+                        if ($modoPrueba) {
+                            // En modo prueba, enviar solo a pasantesistemas1@pollo-fiesta.com
+                            if ($mailer->enviarNovedad($datos, $correoPrueba)) {
                                 $correosEnviados++;
-                                error_log("📧 DESARROLLO: Correo simulado enviado a {$correo}");
+                                error_log("📧 DESARROLLO (PRUEBA): Correo simulado enviado a {$correoPrueba}");
+                            }
+                        } else {
+                            // Enviar a cada usuario
+                            foreach ($correosDestino as $correo) {
+                                if ($mailer->enviarNovedad($datos, $correo)) {
+                                    $correosEnviados++;
+                                    error_log("📧 DESARROLLO: Correo simulado enviado a {$correo}");
+                                }
                             }
                         }
                     } else {
@@ -399,13 +412,23 @@ class NovedadController extends Controller {
                         require_once APP_PATH . '/Helpers/MailHelper.php';
                         $mailer = new \MailHelper();
                         
-                        // Enviar a cada usuario de Gestión Humana
-                        foreach ($correosGestionHumana as $correo) {
-                            if ($mailer->enviarNovedad($datos, $correo)) {
+                        if ($modoPrueba) {
+                            // En modo prueba, enviar solo a pasantesistemas1@pollo-fiesta.com
+                            if ($mailer->enviarNovedad($datos, $correoPrueba)) {
                                 $correosEnviados++;
-                                error_log("✓ Correo enviado exitosamente a {$correo}");
+                                error_log("✓ PRUEBA: Correo enviado a {$correoPrueba}");
                             } else {
-                                error_log("✗ No se pudo enviar el correo a {$correo}");
+                                error_log("✗ PRUEBA: No se pudo enviar el correo a {$correoPrueba}");
+                            }
+                        } else {
+                            // Enviar a cada usuario (5 correos)
+                            foreach ($correosDestino as $correo) {
+                                if ($mailer->enviarNovedad($datos, $correo)) {
+                                    $correosEnviados++;
+                                    error_log("✓ Correo enviado exitosamente a {$correo}");
+                                } else {
+                                    error_log("✗ No se pudo enviar el correo a {$correo}");
+                                }
                             }
                         }
                     }
@@ -417,7 +440,7 @@ class NovedadController extends Controller {
                 
                 // Mensaje de éxito
                 if ($correosEnviados > 0) {
-                    $_SESSION['success'] = 'Formulario enviado correctamente. Se han enviado ' . $correosEnviados . ' notificaciones por correo a Gestión Humana.';
+                    $_SESSION['success'] = 'Formulario enviado correctamente.';
                 } else {
                     $_SESSION['success'] = 'Formulario enviado correctamente.';
                 }
@@ -452,13 +475,26 @@ class NovedadController extends Controller {
         $this->requireAuth();
         $user = $this->getUser();
         
-        // Solo Johanna puede ver estadísticas
-        if (stripos($user['nombre'], 'johanna') === false) {
+        // Usuarios con acceso a estadísticas: Johanna + 4 de Gestión Humana
+        $usuariosConDashboard = ['johanna', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+        $tieneAcceso = false;
+        
+        foreach ($usuariosConDashboard as $userPermitido) {
+            if (stripos($user['nombre'], $userPermitido) !== false || $user['usuario'] === $userPermitido) {
+                $tieneAcceso = true;
+                break;
+            }
+        }
+        
+        if (!$tieneAcceso) {
             $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
             $this->redirect('novedades/crear');
         }
         
         $novedadModel = new Novedad();
+        
+        // Obtener filtro de tiempo
+        $filtroTiempo = $_GET['filtro_tiempo'] ?? 'todos';
         
         // Obtener estadísticas generales
         $stats = [
@@ -469,14 +505,16 @@ class NovedadController extends Controller {
             'por_area' => $novedadModel->getEstadisticasPorZona(),
             'por_turno' => $novedadModel->getNovedadesPorTurno(),
             'descontar_dominical' => $novedadModel->getNovedadesDescontarDominical(),
-            'por_mes' => $novedadModel->getNovedadesPorMes(),
+            'por_mes' => $novedadModel->getNovedadesPorMes($filtroTiempo),
+            'comparativa' => $novedadModel->getComparativa2025vs2026(),
             'top_responsables' => $novedadModel->getTopResponsables()
         ];
         
         $data = [
             'title' => 'Estadísticas y Gráficos',
             'user' => $user,
-            'stats' => $stats
+            'stats' => $stats,
+            'filtro_tiempo' => $filtroTiempo
         ];
         
         $this->view('novedades/estadisticas', $data);

@@ -350,15 +350,52 @@ class Novedad {
         return $stmt->fetchAll();
     }
     
-    // Obtener novedades por mes
-    public function getNovedadesPorMes() {
+    // Obtener novedades por mes con filtro de rango
+    public function getNovedadesPorMes($filtro = 'ultimo_mes') {
+        $whereClause = "";
+        
+        switch ($filtro) {
+            case 'ultimo_mes':
+                $whereClause = "WHERE fecha_novedad >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
+                break;
+            case '3_meses':
+                $whereClause = "WHERE fecha_novedad >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
+                break;
+            case '2025':
+                $whereClause = "WHERE YEAR(fecha_novedad) = 2025";
+                break;
+            case '2026':
+                $whereClause = "WHERE YEAR(fecha_novedad) = 2026";
+                break;
+            case 'todos':
+            default:
+                $whereClause = "";
+                break;
+        }
+        
         $sql = "SELECT 
             DATE_FORMAT(fecha_novedad, '%Y-%m') as mes,
             COUNT(*) as total
         FROM novedades
+        $whereClause
         GROUP BY mes
         ORDER BY mes DESC
         LIMIT 12";
+        
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+    
+    // Obtener comparativa 2025 vs 2026
+    public function getComparativa2025vs2026() {
+        $sql = "SELECT 
+            YEAR(fecha_novedad) as anio,
+            MONTH(fecha_novedad) as mes,
+            COUNT(*) as total
+        FROM novedades
+        WHERE YEAR(fecha_novedad) IN (2025, 2026)
+        GROUP BY anio, mes
+        ORDER BY anio, mes";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();

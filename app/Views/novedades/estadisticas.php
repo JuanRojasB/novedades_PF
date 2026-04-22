@@ -14,6 +14,58 @@
         <button onclick="window.print()" class="btn-print">Imprimir Informe</button>
     </div>
 
+    <!-- Filtros de Tiempo -->
+    <div class="filtros-tiempo">
+        <label>Período:</label>
+        <select id="filtroTiempo" onchange="aplicarFiltro()">
+            <option value="todos" <?php echo ($filtro_tiempo === 'todos') ? 'selected' : ''; ?>>Todos los datos</option>
+            <option value="ultimo_mes" <?php echo ($filtro_tiempo === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+            <option value="3_meses" <?php echo ($filtro_tiempo === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+            <option value="2025" <?php echo ($filtro_tiempo === '2025') ? 'selected' : ''; ?>>Año 2025</option>
+            <option value="2026" <?php echo ($filtro_tiempo === '2026') ? 'selected' : ''; ?>>Año 2026</option>
+        </select>
+    </div>
+
+    <script>
+    function aplicarFiltro() {
+        const filtro = document.getElementById('filtroTiempo').value;
+        window.location.href = '<?php echo base_url('estadisticas'); ?>?filtro_tiempo=' + filtro;
+    }
+    </script>
+
+    <style>
+    .filtros-tiempo {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .filtros-tiempo label {
+        font-weight: 600;
+        color: #334155;
+    }
+    
+    .filtros-tiempo select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        min-width: 200px;
+    }
+    
+    .filtros-tiempo select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    </style>
+
     <?php if ($stats['total_novedades'] == 0): ?>
     <div class="empty-state">
         <p>No hay novedades registradas aún.</p>
@@ -130,6 +182,18 @@
             <div class="stat-card-body">
                 <div class="chart-container-line">
                     <canvas id="chartMensual"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparativa 2025 vs 2026 -->
+        <div class="stat-card stat-card-wide">
+            <div class="stat-card-header">
+                <h3>Comparativa 2025 vs 2026</h3>
+            </div>
+            <div class="stat-card-body">
+                <div class="chart-container-line">
+                    <canvas id="chartComparativa"></canvas>
                 </div>
             </div>
         </div>
@@ -318,6 +382,64 @@ new Chart(document.getElementById('chartAreas'), {
         scales: {
             x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
             y: { grid: { display: false } }
+        }
+    }
+});
+
+// Gráfico Comparativa 2025 vs 2026
+const dataComparativa = <?php echo json_encode($stats['comparativa']); ?>;
+
+// Procesar datos para el gráfico
+const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const datos2025 = new Array(12).fill(0);
+const datos2026 = new Array(12).fill(0);
+
+dataComparativa.forEach(item => {
+    const mesIndex = parseInt(item.mes) - 1;
+    if (item.anio == 2025) {
+        datos2025[mesIndex] = parseInt(item.total);
+    } else if (item.anio == 2026) {
+        datos2026[mesIndex] = parseInt(item.total);
+    }
+});
+
+new Chart(document.getElementById('chartComparativa'), {
+    type: 'line',
+    data: {
+        labels: meses,
+        datasets: [
+            {
+                label: '2025',
+                data: datos2025,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2
+            },
+            {
+                label: '2026',
+                data: datos2026,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                display: true,
+                position: 'top'
+            }
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
         }
     }
 });

@@ -24,30 +24,35 @@ $datosPrueba = [
 
 echo "<h1>🧪 Test de Correo - Sistema de Novedades</h1>";
 echo "<p>Generando correo de prueba...</p>";
+echo "<p><strong>📧 Modo Prueba:</strong> Todos los correos se envían a <code>pasantesistemas1@pollo-fiesta.com</code></p>";
+echo "<hr>";
 
 $mailer = new MailHelperLocal();
 
-// Enviar a los 4 de Gestión Humana
-$correosGH = [
-    'r.humanos@pollo-fiesta.com',
-    'AuxiliarGH2@pollo-fiesta.com',
-    'AuxiliarGH1@pollo-fiesta.com',
-    'profesionalnomina@pollo-fiesta.com'
-];
+// En modo prueba, enviar solo a pasantesistemas1@pollo-fiesta.com
+$correoPrueba = 'pasantesistemas1@pollo-fiesta.com';
 
-$enviados = 0;
-foreach ($correosGH as $correo) {
-    if ($mailer->enviarNovedad($datosPrueba, $correo)) {
-        echo "<p>✅ Correo simulado enviado a: <strong>{$correo}</strong></p>";
-        $enviados++;
-    } else {
-        echo "<p>❌ Error al enviar correo a: <strong>{$correo}</strong></p>";
-    }
+if ($mailer->enviarNovedad($datosPrueba, $correoPrueba)) {
+    echo "<p>✅ Correo simulado enviado a: <strong>{$correoPrueba}</strong></p>";
+    echo "<p><em>Este correo representa el envío a los 5 usuarios (4 de GH + Johanna)</em></p>";
+    $enviados = 1;
+} else {
+    echo "<p>❌ Error al enviar correo a: <strong>{$correoPrueba}</strong></p>";
+    $enviados = 0;
 }
 
 echo "<hr>";
 echo "<h2>📊 Resumen</h2>";
-echo "<p>Total de correos enviados: <strong>{$enviados}/4</strong></p>";
+echo "<p>Total de correos enviados: <strong>{$enviados}</strong></p>";
+echo "<p><strong>Destinatario de prueba:</strong> pasantesistemas1@pollo-fiesta.com</p>";
+echo "<p><em>En producción, se enviarán 5 correos a:</em></p>";
+echo "<ul>";
+echo "<li>r.humanos@pollo-fiesta.com (Elsa Becerra)</li>";
+echo "<li>AuxiliarGH2@pollo-fiesta.com (Catherine Ortiz)</li>";
+echo "<li>AuxiliarGH1@pollo-fiesta.com (Carmenza Martinez)</li>";
+echo "<li>profesionalnomina@pollo-fiesta.com (Michelle Velandia)</li>";
+echo "<li>innovacion@pollo-fiesta.com (Johanna)</li>";
+echo "</ul>";
 echo "<p>Los correos se guardaron en la carpeta <code>storage/</code></p>";
 
 // Listar archivos de correo generados
