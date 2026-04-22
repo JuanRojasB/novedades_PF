@@ -28,13 +28,11 @@ class AreaTrabajo {
     }
     
     public function getAllUnique($soloActivos = true) {
-        // Solo áreas de Sede 1, Sede 2 y Sede 3
+        // Traer TODAS las áreas únicas (sin filtrar por sede)
         $sql = "SELECT MIN(at.id) as id, at.nombre
-                FROM areas_trabajo at
-                INNER JOIN sedes s ON at.sede_id = s.id
-                WHERE s.nombre IN ('Sede 1', 'Sede 2', 'Sede 3')";
+                FROM areas_trabajo at";
         if ($soloActivos) {
-            $sql .= " AND at.activo = 1";
+            $sql .= " WHERE at.activo = 1";
         }
         $sql .= " GROUP BY at.nombre ORDER BY at.nombre ASC";
         

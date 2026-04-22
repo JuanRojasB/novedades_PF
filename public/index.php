@@ -46,6 +46,7 @@ $routes = [
     'novedades/guardar' => ['controller' => 'Controllers\NovedadController', 'method' => 'guardar'],
     'novedades' => ['controller' => 'Controllers\NovedadController', 'method' => 'index'],
     'estadisticas' => ['controller' => 'Controllers\NovedadController', 'method' => 'estadisticas'],
+    'usuarios/lista' => ['controller' => 'Controllers\NovedadController', 'method' => 'listarUsuarios'],
     'admin' => ['controller' => 'Controllers\AdminController', 'method' => 'index'],
     'admin/crearSede' => ['controller' => 'Controllers\AdminController', 'method' => 'crearSede'],
     'admin/actualizarSede' => ['controller' => 'Controllers\AdminController', 'method' => 'actualizarSede'],
@@ -59,6 +60,18 @@ $routes = [
 ];
 
 // Rutas API dinámicas
+if ($path === 'api/estadisticas') {
+    $controller = new Controllers\NovedadController();
+    $controller->apiEstadisticas();
+    exit;
+}
+
+if ($path === 'api/empleado-detalle') {
+    $controller = new Controllers\NovedadController();
+    $controller->apiEmpleadoDetalle();
+    exit;
+}
+
 if (preg_match('#^api/zonas/(\d+)$#', $path, $matches)) {
     $controller = new Controllers\ApiController();
     $controller->zonas($matches[1]);

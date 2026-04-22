@@ -1,27 +1,26 @@
-# Ignorar archivos de almacenamiento (ya no se usan, archivos en BD)
-storage/uploads/*
-!storage/uploads/.gitkeep
+# Archivos de desarrollo local
+composer.phar
+/storage/correo_*.html
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+!/storage/uploads/.htaccess
 
-# Ignorar archivos de configuración local
-config/local.php
-config/config.php
+# Scripts de diagnóstico (no subir a producción)
+/public/diagnostico_*.php
+/public/test_*.php
 
-# Ignorar archivos del sistema
-.DS_Store
-Thumbs.db
-.vscode/
+# Configuración local
+/config/config.php
 
-# Ignorar logs
+# Logs
 *.log
 
-# Ignorar archivos temporales
-*.tmp
-*.bak
-*.swp
+# Sistema operativo
+.DS_Store
+Thumbs.db
 
-# Ignorar node_modules si se usa npm
-node_modules/
-
-# Ignorar archivos de IDE
+# IDE
+.vscode/
 .idea/
-*.sublime-*
+*.swp
+*.swo

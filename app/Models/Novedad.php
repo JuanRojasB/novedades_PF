@@ -11,6 +11,8 @@ class Novedad {
     
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
+        // Asegurar UTF-8 en las consultas
+        $this->db->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
     }
     
     public function getAll($filters = []) {
@@ -273,27 +275,55 @@ class Novedad {
         return $stmt->execute([':id' => $id]);
     }
     
-    // Obtener estadísticas por zona
-    public function getEstadisticasPorZona() {
+    // Método auxiliar para construir WHERE clause con filtros de fecha
+    private function buildDateFilter($filtro = 'todos') {
+        switch ($filtro) {
+            case 'ultimo_mes':
+                return "WHERE fecha_novedad >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
+            case '3_meses':
+                return "WHERE fecha_novedad >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
+            case '6_meses':
+                return "WHERE fecha_novedad >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)";
+            case '2024':
+                return "WHERE YEAR(fecha_novedad) = 2024";
+            case '2025':
+                return "WHERE YEAR(fecha_novedad) = 2025";
+            case '2026':
+                return "WHERE YEAR(fecha_novedad) = 2026";
+            case 'todos':
+            default:
+                return "";
+        }
+    }
+    
+    // Obtener estadísticas por zona con filtro
+    public function getEstadisticasPorZona($filtro = 'todos') {
+        $whereClause = $this->buildDateFilter($filtro);
+        
         $sql = "SELECT 
             area_trabajo,
             COUNT(*) as total_novedades,
             COUNT(CASE WHEN justificacion = 'SI' THEN 1 END) as justificadas,
             COUNT(CASE WHEN justificacion = 'NO' THEN 1 END) as no_justificadas
         FROM novedades
+        $whereClause
         GROUP BY area_trabajo
-        ORDER BY total_novedades DESC";
+        ORDER BY total_novedades DESC
+        LIMIT 15";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
     
-    // Obtener novedades por sede
-    public function getNovedadesPorSede() {
+    // Obtener novedades por sede con filtro
+    public function getNovedadesPorSede($filtro = 'todos') {
+        $whereClause = $this->buildDateFilter($filtro);
+        
         $sql = "SELECT 
             sede,
             COUNT(*) as total
         FROM novedades
+        $whereClause
         GROUP BY sede
         ORDER BY total DESC";
         
@@ -301,49 +331,62 @@ class Novedad {
         return $stmt->fetchAll();
     }
     
-    // Obtener novedades por tipo
-    public function getNovedadesPorTipo() {
+    // Obtener novedades por tipo con filtro
+    public function getNovedadesPorTipo($filtro = 'todos') {
+        $whereClause = $this->buildDateFilter($filtro);
+        
         $sql = "SELECT 
             novedad as tipo,
             COUNT(*) as total
         FROM novedades
+        $whereClause
         GROUP BY novedad
-        ORDER BY total DESC";
+        ORDER BY total DESC
+        LIMIT 10";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
     
-    // Obtener novedades por justificación
-    public function getNovedadesPorJustificacion() {
+    // Obtener novedades por justificación con filtro
+    public function getNovedadesPorJustificacion($filtro = 'todos') {
+        $whereClause = $this->buildDateFilter($filtro);
+        
         $sql = "SELECT 
             justificacion,
             COUNT(*) as total
         FROM novedades
+        $whereClause
         GROUP BY justificacion";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
     
-    // Obtener novedades por turno
-    public function getNovedadesPorTurno() {
+    // Obtener novedades por turno con filtro
+    public function getNovedadesPorTurno($filtro = 'todos') {
+        $whereClause = $this->buildDateFilter($filtro);
+        
         $sql = "SELECT 
             turno,
             COUNT(*) as total
         FROM novedades
+        $whereClause
         GROUP BY turno";
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
     
-    // Obtener novedades con descuento dominical
-    public function getNovedadesDescontarDominical() {
+    // Obtener novedades con descuento dominical con filtro
+    public function getNovedadesDescontarDominical($filtro = 'todos') {
+        $whereClause = $this->buildDateFilter($filtro);
+        
         $sql = "SELECT 
             descontar_dominical,
             COUNT(*) as total
         FROM novedades
+        $whereClause
         GROUP BY descontar_dominical";
         
         $stmt = $this->db->query($sql);
@@ -413,5 +456,106 @@ class Novedad {
         
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
+    }
+    
+    public function getEstadisticasPorEmpleado() {
+        try {
+            $stmt = $this->db->query("
+                SELECT 
+                    -- Tomar el nombre más reciente para cada cédula
+                    (SELECT nombres_apellidos FROM novedades n2 WHERE n2.numero_cedula = n.numero_cedula ORDER BY n2.created_at DESC LIMIT 1) as nombres_apellidos,
+                    numero_cedula,
+                    -- Tomar la sede más reciente
+                    (SELECT sede FROM novedades n3 WHERE n3.numero_cedula = n.numero_cedula ORDER BY n3.created_at DESC LIMIT 1) as sede,
+                    -- Tomar el área más reciente
+                    (SELECT area_trabajo FROM novedades n4 WHERE n4.numero_cedula = n.numero_cedula ORDER BY n4.created_at DESC LIMIT 1) as area_trabajo,
+                    COUNT(*) as total_novedades,
+                    SUM(CASE WHEN novedad = 'AUSENCIA' THEN 1 ELSE 0 END) as ausencias,
+                    SUM(CASE WHEN novedad = 'INCAPACIDAD' THEN 1 ELSE 0 END) as incapacidades,
+                    SUM(CASE WHEN novedad = 'VACACIONES' THEN 1 ELSE 0 END) as vacaciones,
+                    SUM(CASE WHEN novedad = 'PERMISO REMUNERADO' THEN 1 ELSE 0 END) as permisos_remunerados,
+                    SUM(CASE WHEN novedad = 'PERMISO NO REMUNERADO' THEN 1 ELSE 0 END) as permisos_no_remunerados,
+                    SUM(CASE WHEN novedad = 'RENUNCIA' THEN 1 ELSE 0 END) as renuncias,
+                    SUM(CASE WHEN justificacion = 'SI' THEN 1 ELSE 0 END) as justificadas,
+                    SUM(CASE WHEN justificacion = 'NO' THEN 1 ELSE 0 END) as no_justificadas,
+                    SUM(CASE WHEN descontar_dominical = 'SI' THEN 1 ELSE 0 END) as con_descuento_dominical,
+                    MIN(fecha_novedad) as primera_novedad,
+                    MAX(fecha_novedad) as ultima_novedad,
+                    MAX(created_at) as ultimo_registro
+                FROM novedades n
+                GROUP BY numero_cedula
+                ORDER BY total_novedades DESC, nombres_apellidos ASC
+            ");
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getEstadisticasTiposNovedad() {
+        try {
+            $stmt = $this->db->query("
+                SELECT 
+                    novedad as tipo,
+                    COUNT(*) as total,
+                    ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM novedades)), 1) as porcentaje
+                FROM novedades 
+                GROUP BY novedad 
+                ORDER BY total DESC
+            ");
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getEstadisticasTiposNovedadPorEmpleado($cedula) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    novedad as tipo,
+                    COUNT(*) as total,
+                    ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM novedades WHERE numero_cedula = ?)), 1) as porcentaje
+                FROM novedades 
+                WHERE numero_cedula = ?
+                GROUP BY novedad 
+                ORDER BY total DESC
+            ");
+            $stmt->execute([$cedula, $cedula]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
+    public function getTotalEmpleadosConNovedades() {
+        try {
+            $stmt = $this->db->query("
+                SELECT COUNT(DISTINCT numero_cedula) as total 
+                FROM novedades
+            ");
+            $result = $stmt->fetch();
+            return (int)$result['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+    
+    public function getNovedadesPorEmpleado($nombre, $cedula) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    id, fecha_novedad, nombres_apellidos, numero_cedula, sede, zona_geografica,
+                    area_trabajo, turno, novedad, justificacion, descontar_dominical,
+                    observacion_novedad, nota, responsable, created_at, updated_at
+                FROM novedades 
+                WHERE numero_cedula = ?
+                ORDER BY fecha_novedad DESC, created_at DESC
+            ");
+            $stmt->execute([$cedula]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            return [];
+        }
     }
 }

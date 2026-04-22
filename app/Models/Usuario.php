@@ -135,4 +135,28 @@ class Usuario {
         $result = $stmt->fetch();
         return $result['count'] > 0;
     }
+    
+    // Obtener total de usuarios
+    public function getTotalUsuarios() {
+        try {
+            $stmt = $this->db->query("SELECT COUNT(*) as total FROM usuarios");
+            $result = $stmt->fetch();
+            return (int)$result['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+    
+    public function getAllUsuarios() {
+        try {
+            $stmt = $this->db->query("
+                SELECT id, usuario, nombre, cargo, email, rol, created_at 
+                FROM usuarios 
+                ORDER BY nombre ASC
+            ");
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 }

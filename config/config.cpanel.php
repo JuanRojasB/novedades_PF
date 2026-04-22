@@ -1,12 +1,12 @@
 <?php
-// config/config.cpanel.php - Configuración para cPanel
-// RENOMBRAR ESTE ARCHIVO A config.php DESPUÉS DE SUBIR A CPANEL
+// config/config.php - Configuración para PRODUCCIÓN (cPanel)
 
 return [
     'app' => [
         'name' => 'Sistema de Novedades - Pollo Fiesta',
         'version' => '1.0.0',
-        'url' => 'https://pollo-fiesta.com', // CAMBIAR por tu dominio real
+        'url' => 'https://pollo-fiesta.com',
+        'environment' => 'production',
     ],
     
     'database' => [
@@ -15,9 +15,9 @@ return [
         
         // Configuración MySQL para cPanel
         'host' => 'localhost',
-        'database' => 'wwpoll_informe_novedades', // ✓ Ya configurado
-        'username' => 'wwpoll_admin_novedades', // CAMBIAR: reemplazar USUARIO con el nombre real
-        'password' => '^8znu9HDk[D2#)y-', // CAMBIAR: poner la contraseña de la BD
+        'database' => 'wwpoll_informe_novedades',
+        'username' => 'wwpoll_admin_novedades',
+        'password' => '^8znu9HDk[D2#)y-',
         'charset' => 'utf8mb4'
     ],
     
@@ -34,11 +34,15 @@ return [
     ],
 
     'mail' => [
-        'host'       => 'pollo-fiesta.com', // Servidor SMTP del dominio
+        // Modo: 'file' = Guardar como HTML (temporal) | 'smtp' = Enviar por correo (producción)
+        'mode' => 'file', // ⚠️ Cambiar a 'smtp' cuando funcione el correo
+        
+        // Configuración SMTP
+        'host'       => 'pollo-fiesta.com',
         'port'       => 465,
         'encryption' => 'ssl',
         'username'   => 'innovacion@pollo-fiesta.com',
-        'password'   => '^8znu9HDk[D2#)y-', // CAMBIAR: poner la contraseña real del correo
+        'password'   => 'Sistemas2026*',
         'from_email' => 'innovacion@pollo-fiesta.com',
         'from_name'  => 'Sistema de Novedades - Pollo Fiesta',
     ]

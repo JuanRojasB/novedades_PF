@@ -9,8 +9,7 @@
     <!-- Header -->
     <div class="page-header">
         <div>
-            <h1>Dashboard</h1>
-            <span class="total-badge"><?php echo count($novedades); ?> registros</span>
+            <h1>Novedades</h1>
         </div>
         <a href="<?php echo base_url('novedades/crear'); ?>" class="btn-primary">+ Nueva Novedad</a>
     </div>
@@ -232,10 +231,10 @@
                         </td>
                         <td><?php echo htmlspecialchars($novedad['responsable']); ?></td>
                         <td class="td-acciones">
-                            <button class="btn-icon" onclick="verDetalle(<?php echo $novedad['id']; ?>)">Ver</button>
+                            <button class="btn-icon" onclick="verDetalle(<?php echo $novedad['id']; ?>)">Detalle</button>
                             <?php if ((int)$novedad['total_archivos'] > 0): ?>
                                 <button class="btn-icon btn-icon-green" onclick="verArchivos(<?php echo $novedad['id']; ?>)">
-                                    Archivos (<?php echo $novedad['total_archivos']; ?>)
+                                    Adjuntos (<?php echo $novedad['total_archivos']; ?>)
                                 </button>
                             <?php endif; ?>
                         </td>
@@ -580,6 +579,7 @@ function filtrarTabla(q) {
         }
     });
 
+    // Actualizar contador de búsqueda
     if (q) {
         countEl.textContent = visibles + ' resultado' + (visibles !== 1 ? 's' : '');
         countEl.style.display = 'inline-block';
@@ -587,8 +587,41 @@ function filtrarTabla(q) {
         countEl.style.display = 'none';
     }
 
+    // Actualizar contador de paginación
+    actualizarContadorPaginacion(visibles, q);
+
     if (noResults) {
         noResults.style.display = (q && visibles === 0) ? 'block' : 'none';
+    }
+}
+
+function actualizarContadorPaginacion(visibles, hayBusqueda) {
+    const paginationInfo = document.querySelector('.pagination-info');
+    const pagination = document.querySelector('.pagination');
+    if (!paginationInfo) return;
+
+    const totalOriginal = <?php echo $totalNovedades; ?>;
+    
+    if (hayBusqueda) {
+        // Cuando hay búsqueda activa, mostrar el rango de resultados filtrados
+        if (visibles > 0) {
+            paginationInfo.innerHTML = `Mostrando <strong>1-${visibles}</strong> de <strong>${visibles.toLocaleString('es-CO')}</strong> novedades`;
+        } else {
+            paginationInfo.innerHTML = `Mostrando <strong>0</strong> de <strong>0</strong> novedades`;
+        }
+        // Ocultar los botones de paginación durante la búsqueda
+        if (pagination) {
+            pagination.style.display = 'none';
+        }
+    } else {
+        // Cuando no hay búsqueda, volver a los valores originales de PHP
+        const inicio = <?php echo (($paginaActual - 1) * $porPagina) + 1; ?>;
+        const fin = <?php echo min($paginaActual * $porPagina, $totalNovedades); ?>;
+        paginationInfo.innerHTML = `Mostrando <strong>${inicio}-${fin}</strong> de <strong>${totalOriginal.toLocaleString('es-CO')}</strong> novedades`;
+        // Mostrar los botones de paginación cuando no hay búsqueda
+        if (pagination) {
+            pagination.style.display = 'flex';
+        }
     }
 }
 

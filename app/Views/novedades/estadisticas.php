@@ -11,55 +11,42 @@
             <h1>Estadísticas y Gráficos</h1>
             <p class="stats-subtitle">Informe de Novedades</p>
         </div>
-        <button onclick="window.print()" class="btn-print">Imprimir Informe</button>
     </div>
-
-    <!-- Filtros de Tiempo -->
-    <div class="filtros-tiempo">
-        <label>Período:</label>
-        <select id="filtroTiempo" onchange="aplicarFiltro()">
-            <option value="todos" <?php echo ($filtro_tiempo === 'todos') ? 'selected' : ''; ?>>Todos los datos</option>
-            <option value="ultimo_mes" <?php echo ($filtro_tiempo === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
-            <option value="3_meses" <?php echo ($filtro_tiempo === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
-            <option value="2025" <?php echo ($filtro_tiempo === '2025') ? 'selected' : ''; ?>>Año 2025</option>
-            <option value="2026" <?php echo ($filtro_tiempo === '2026') ? 'selected' : ''; ?>>Año 2026</option>
-        </select>
-    </div>
-
-    <script>
-    function aplicarFiltro() {
-        const filtro = document.getElementById('filtroTiempo').value;
-        window.location.href = '<?php echo base_url('estadisticas'); ?>?filtro_tiempo=' + filtro;
-    }
-    </script>
 
     <style>
-    .filtros-tiempo {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        margin-bottom: 2rem;
+    .filtro-grafico {
         display: flex;
         align-items: center;
-        gap: 1rem;
-    }
-    
-    .filtros-tiempo label {
-        font-weight: 600;
-        color: #334155;
-    }
-    
-    .filtros-tiempo select {
-        padding: 0.5rem 1rem;
-        border: 1px solid #e2e8f0;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8fafc;
         border-radius: 8px;
-        font-size: 0.95rem;
-        cursor: pointer;
-        min-width: 200px;
     }
     
-    .filtros-tiempo select:focus {
+    .filtro-grafico label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.875rem;
+        min-width: 60px;
+    }
+    
+    .filtro-grafico select {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        background: white;
+        transition: all 0.2s;
+    }
+    
+    .filtro-grafico select:hover {
+        border-color: #cbd5e1;
+    }
+    
+    .filtro-grafico select:focus {
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -73,10 +60,22 @@
     </div>
     <?php else: ?>
 
-    <!-- Resumen Principal -->
-    <div class="main-stat">
-        <div class="main-stat-value"><?php echo number_format($stats['total_novedades'], 0, ',', '.'); ?></div>
-        <div class="main-stat-label">Total de Novedades Registradas</div>
+    <!-- Resumen Principal - Dos columnas -->
+    <div class="main-stats-container">
+        <div class="main-stat">
+            <div class="main-stat-value"><?php echo number_format($stats['total_novedades'], 0, ',', '.'); ?></div>
+            <div class="main-stat-label">Total de Novedades Registradas</div>
+        </div>
+
+        <div class="main-stat">
+            <div class="main-stat-value"><?php echo number_format($totalEmpleadosConNovedades ?? 0, 0, ',', '.'); ?></div>
+            <div class="main-stat-label">Empleados con Novedades</div>
+            <div style="margin-top: 1.5rem;">
+                <a href="<?php echo base_url('usuarios/lista'); ?>" class="btn-primary btn-usuarios" style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1.5rem; font-size: 0.95rem; background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: none;">
+                    Ver Estadísticas por Empleado
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Gráficos -->
@@ -88,6 +87,16 @@
                 <h3>Novedades por Sede</h3>
             </div>
             <div class="stat-card-body">
+                <div class="filtro-grafico">
+                    <label>Período:</label>
+                    <select onchange="aplicarFiltroGrafico('sede', this.value)">
+                        <option value="todos" <?php echo ($filtros['sede'] === 'todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="ultimo_mes" <?php echo ($filtros['sede'] === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+                        <option value="3_meses" <?php echo ($filtros['sede'] === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+                        <option value="2025" <?php echo ($filtros['sede'] === '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo ($filtros['sede'] === '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                </div>
                 <div class="chart-container">
                     <canvas id="chartSede"></canvas>
                 </div>
@@ -108,6 +117,16 @@
                 <h3>Tipos de Novedad</h3>
             </div>
             <div class="stat-card-body">
+                <div class="filtro-grafico">
+                    <label>Período:</label>
+                    <select onchange="aplicarFiltroGrafico('tipo', this.value)">
+                        <option value="todos" <?php echo ($filtros['tipo'] === 'todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="ultimo_mes" <?php echo ($filtros['tipo'] === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+                        <option value="3_meses" <?php echo ($filtros['tipo'] === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+                        <option value="2025" <?php echo ($filtros['tipo'] === '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo ($filtros['tipo'] === '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                </div>
                 <div class="chart-container">
                     <canvas id="chartTipo"></canvas>
                 </div>
@@ -128,6 +147,16 @@
                 <h3>Estado de Justificación</h3>
             </div>
             <div class="stat-card-body">
+                <div class="filtro-grafico">
+                    <label>Período:</label>
+                    <select onchange="aplicarFiltroGrafico('justificacion', this.value)">
+                        <option value="todos" <?php echo ($filtros['justificacion'] === 'todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="ultimo_mes" <?php echo ($filtros['justificacion'] === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+                        <option value="3_meses" <?php echo ($filtros['justificacion'] === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+                        <option value="2025" <?php echo ($filtros['justificacion'] === '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo ($filtros['justificacion'] === '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                </div>
                 <div class="chart-container">
                     <canvas id="chartJustificacion"></canvas>
                 </div>
@@ -148,6 +177,16 @@
                 <h3>Novedades por Turno</h3>
             </div>
             <div class="stat-card-body">
+                <div class="filtro-grafico">
+                    <label>Período:</label>
+                    <select onchange="aplicarFiltroGrafico('turno', this.value)">
+                        <option value="todos" <?php echo ($filtros['turno'] === 'todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="ultimo_mes" <?php echo ($filtros['turno'] === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+                        <option value="3_meses" <?php echo ($filtros['turno'] === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+                        <option value="2025" <?php echo ($filtros['turno'] === '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo ($filtros['turno'] === '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                </div>
                 <div class="chart-container">
                     <canvas id="chartTurno"></canvas>
                 </div>
@@ -165,9 +204,19 @@
         <!-- Áreas de Trabajo -->
         <div class="stat-card stat-card-wide">
             <div class="stat-card-header">
-                <h3>Áreas de Trabajo</h3>
+                <h3>Áreas de Trabajo (Top 10)</h3>
             </div>
             <div class="stat-card-body">
+                <div class="filtro-grafico">
+                    <label>Período:</label>
+                    <select onchange="aplicarFiltroGrafico('area', this.value)">
+                        <option value="todos" <?php echo ($filtros['area'] === 'todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="ultimo_mes" <?php echo ($filtros['area'] === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+                        <option value="3_meses" <?php echo ($filtros['area'] === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+                        <option value="2025" <?php echo ($filtros['area'] === '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo ($filtros['area'] === '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                </div>
                 <div class="chart-container-horizontal">
                     <canvas id="chartAreas"></canvas>
                 </div>
@@ -180,6 +229,16 @@
                 <h3>Tendencia Mensual</h3>
             </div>
             <div class="stat-card-body">
+                <div class="filtro-grafico">
+                    <label>Período:</label>
+                    <select onchange="aplicarFiltroGrafico('mensual', this.value)">
+                        <option value="todos" <?php echo ($filtros['mensual'] === 'todos') ? 'selected' : ''; ?>>Todos</option>
+                        <option value="ultimo_mes" <?php echo ($filtros['mensual'] === 'ultimo_mes') ? 'selected' : ''; ?>>Último mes</option>
+                        <option value="3_meses" <?php echo ($filtros['mensual'] === '3_meses') ? 'selected' : ''; ?>>Últimos 3 meses</option>
+                        <option value="2025" <?php echo ($filtros['mensual'] === '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo ($filtros['mensual'] === '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                </div>
                 <div class="chart-container-line">
                     <canvas id="chartMensual"></canvas>
                 </div>
@@ -202,20 +261,67 @@
 
     <!-- Conclusiones -->
     <div class="conclusions">
-        <h3>Conclusiones de Copilot</h3>
+        <h3>Conclusiones de FIA</h3>
+        <p class="conclusions-subtitle">Análisis basado en el total de <?php echo number_format($stats['total_novedades'], 0, ',', '.'); ?> novedades registradas</p>
         <div class="conclusions-content">
             <?php
-            $tipo_mas_comun = $stats['por_tipo'][0] ?? null;
-            $justificadas = 0; $sin_justificar = 0;
-            foreach ($stats['por_justificacion'] as $item) {
+            // USAR DATOS SIN FILTROS PARA CONCLUSIONES
+            $total = $stats['total_novedades'];
+            
+            // Tipos más comunes (top 3) - SIN FILTROS
+            $tipos_comunes = array_slice($stats['conclusiones']['por_tipo'], 0, 3);
+            $texto_tipos = '';
+            if (count($tipos_comunes) >= 3) {
+                $tipo1 = htmlspecialchars($tipos_comunes[0]['tipo']);
+                $tipo2 = htmlspecialchars($tipos_comunes[1]['tipo']);
+                $tipo3 = htmlspecialchars($tipos_comunes[2]['tipo']);
+                $pct1 = $total > 0 ? round(($tipos_comunes[0]['total'] / $total) * 100, 1) : 0;
+                $pct2 = $total > 0 ? round(($tipos_comunes[1]['total'] / $total) * 100, 1) : 0;
+                $pct3 = $total > 0 ? round(($tipos_comunes[2]['total'] / $total) * 100, 1) : 0;
+                $texto_tipos = "$tipo1 ($pct1%), seguidas por $tipo2 ($pct2%) y $tipo3 ($pct3%)";
+            } elseif (count($tipos_comunes) == 2) {
+                $tipo1 = htmlspecialchars($tipos_comunes[0]['tipo']);
+                $tipo2 = htmlspecialchars($tipos_comunes[1]['tipo']);
+                $pct1 = $total > 0 ? round(($tipos_comunes[0]['total'] / $total) * 100, 1) : 0;
+                $pct2 = $total > 0 ? round(($tipos_comunes[1]['total'] / $total) * 100, 1) : 0;
+                $texto_tipos = "$tipo1 ($pct1%) y $tipo2 ($pct2%)";
+            } elseif (count($tipos_comunes) == 1) {
+                $tipo1 = htmlspecialchars($tipos_comunes[0]['tipo']);
+                $pct1 = $total > 0 ? round(($tipos_comunes[0]['total'] / $total) * 100, 1) : 0;
+                $texto_tipos = "$tipo1 ($pct1%)";
+            }
+            
+            // Justificación - SIN FILTROS
+            $justificadas = 0; 
+            $sin_justificar = 0;
+            foreach ($stats['conclusiones']['por_justificacion'] as $item) {
                 if ($item['justificacion'] === 'SI') $justificadas = $item['total'];
                 elseif ($item['justificacion'] === 'NO') $sin_justificar = $item['total'];
             }
-            $total = $stats['total_novedades'];
             $pct_justificadas = $total > 0 ? round(($justificadas / $total) * 100, 1) : 0;
             $pct_sin_justificar = $total > 0 ? round(($sin_justificar / $total) * 100, 1) : 0;
+            
+            // Descuento dominical - SIN FILTROS
+            $con_descuento = 0;
+            $sin_descuento = 0;
+            foreach ($stats['conclusiones']['descontar_dominical'] as $item) {
+                if ($item['descontar_dominical'] === 'SI') $con_descuento = $item['total'];
+                elseif ($item['descontar_dominical'] === 'NO') $sin_descuento = $item['total'];
+            }
+            $pct_descuento = $total > 0 ? round(($con_descuento / $total) * 100, 1) : 0;
             ?>
-            <p>Las novedades más recurrentes son las ausencias, seguidas por permisos remunerados y vacaciones. El <?php echo $pct_justificadas; ?>% están justificadas, el <?php echo $pct_sin_justificar; ?>% sin justificación y el <?php echo 100 - $pct_justificadas - $pct_sin_justificar; ?>% permanecen pendientes de justificación. Más de la mitad de las ausencias (51%) implican considerar el descuento del dominical. Estos datos son útiles para mejorar la administración del personal.</p>
+            <p>
+                <?php if ($texto_tipos): ?>
+                    Las novedades más recurrentes son <?php echo $texto_tipos; ?>. 
+                <?php endif; ?>
+                <?php if ($justificadas > 0 || $sin_justificar > 0): ?>
+                    El <?php echo $pct_justificadas; ?>% están justificadas y el <?php echo $pct_sin_justificar; ?>% sin justificación. 
+                <?php endif; ?>
+                <?php if ($pct_descuento > 0): ?>
+                    El <?php echo $pct_descuento; ?>% de las novedades implican considerar el descuento del dominical. 
+                <?php endif; ?>
+                Estos datos son útiles para mejorar la administración del personal.
+            </p>
         </div>
     </div>
 
@@ -227,6 +333,202 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
+// Almacenar instancias de gráficos
+let charts = {};
+
+// Función para aplicar filtro individual a cada gráfico SIN recargar la página
+function aplicarFiltroGrafico(grafico, valor) {
+    console.log('Aplicando filtro:', grafico, valor);
+    
+    // Mapear nombres de gráficos a IDs de canvas
+    const graficosMap = {
+        'sede': 'chartSede',
+        'tipo': 'chartTipo',
+        'justificacion': 'chartJustificacion',
+        'turno': 'chartTurno',
+        'area': 'chartAreas',  // Plural!
+        'mensual': 'chartMensual'
+    };
+    
+    const canvasId = graficosMap[grafico];
+    if (!canvasId) {
+        console.error('Gráfico no reconocido:', grafico);
+        return;
+    }
+    
+    // Mostrar indicador de carga
+    const chartElement = document.getElementById(canvasId);
+    if (!chartElement) {
+        console.error('No se encontró el elemento del gráfico:', grafico, 'con ID:', canvasId);
+        return;
+    }
+    
+    const card = chartElement.closest('.stat-card');
+    const body = card.querySelector('.stat-card-body');
+    body.style.opacity = '0.5';
+    body.style.pointerEvents = 'none';
+    
+    // Hacer petición AJAX
+    const url = '<?php echo base_url('api/estadisticas'); ?>?grafico=' + grafico + '&filtro=' + valor;
+    console.log('URL:', url);
+    
+    fetch(url)
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error('Error en la respuesta: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos recibidos:', data);
+            // Actualizar el gráfico específico
+            actualizarGrafico(grafico, data);
+            
+            // Restaurar opacidad
+            body.style.opacity = '1';
+            body.style.pointerEvents = 'auto';
+        })
+        .catch(error => {
+            console.error('Error al actualizar gráfico:', error);
+            alert('Error al actualizar el gráfico. Revisa la consola para más detalles.');
+            body.style.opacity = '1';
+            body.style.pointerEvents = 'auto';
+        });
+}
+
+// Función para actualizar un gráfico específico
+function actualizarGrafico(tipo, data) {
+    console.log('Actualizando gráfico:', tipo, data);
+    
+    switch(tipo) {
+        case 'sede':
+            actualizarGraficoSede(data);
+            break;
+        case 'tipo':
+            actualizarGraficoTipo(data);
+            break;
+        case 'justificacion':
+            actualizarGraficoJustificacion(data);
+            break;
+        case 'turno':
+            actualizarGraficoTurno(data);
+            break;
+        case 'area':
+            actualizarGraficoArea(data);
+            break;
+        case 'mensual':
+            actualizarGraficoMensual(data);
+            break;
+        default:
+            console.error('Tipo de gráfico no reconocido:', tipo);
+    }
+}
+
+function actualizarGraficoSede(data) {
+    if (!charts.sede) {
+        console.error('Gráfico sede no inicializado');
+        return;
+    }
+    charts.sede.data.labels = data.map(item => item.sede);
+    charts.sede.data.datasets[0].data = data.map(item => item.total);
+    charts.sede.update();
+    
+    // Actualizar lista
+    const lista = document.querySelector('#chartSede').closest('.stat-card-body').querySelector('.stat-list');
+    if (lista) {
+        lista.innerHTML = data.map(item => `
+            <div class="stat-item">
+                <span class="stat-item-label">${item.sede}</span>
+                <span class="stat-item-value">${item.total}</span>
+            </div>
+        `).join('');
+    }
+}
+
+function actualizarGraficoTipo(data) {
+    if (!charts.tipo) {
+        console.error('Gráfico tipo no inicializado');
+        return;
+    }
+    charts.tipo.data.labels = data.map(item => item.tipo);
+    charts.tipo.data.datasets[0].data = data.map(item => item.total);
+    charts.tipo.update();
+    
+    // Actualizar lista
+    const lista = document.querySelector('#chartTipo').closest('.stat-card-body').querySelector('.stat-list');
+    if (lista) {
+        lista.innerHTML = data.map(item => `
+            <div class="stat-item">
+                <span class="stat-item-label">${item.tipo}</span>
+                <span class="stat-item-value">${item.total}</span>
+            </div>
+        `).join('');
+    }
+}
+
+function actualizarGraficoJustificacion(data) {
+    if (!charts.justificacion) {
+        console.error('Gráfico justificacion no inicializado');
+        return;
+    }
+    charts.justificacion.data.labels = data.map(item => item.justificacion);
+    charts.justificacion.data.datasets[0].data = data.map(item => item.total);
+    charts.justificacion.update();
+    
+    // Actualizar lista
+    const lista = document.querySelector('#chartJustificacion').closest('.stat-card-body').querySelector('.stat-list');
+    if (lista) {
+        lista.innerHTML = data.map(item => `
+            <div class="stat-item">
+                <span class="stat-item-label">${item.justificacion}</span>
+                <span class="stat-item-value">${item.total}</span>
+            </div>
+        `).join('');
+    }
+}
+
+function actualizarGraficoTurno(data) {
+    if (!charts.turno) {
+        console.error('Gráfico turno no inicializado');
+        return;
+    }
+    charts.turno.data.labels = data.map(item => item.turno);
+    charts.turno.data.datasets[0].data = data.map(item => item.total);
+    charts.turno.update();
+    
+    // Actualizar lista
+    const lista = document.querySelector('#chartTurno').closest('.stat-card-body').querySelector('.stat-list');
+    if (lista) {
+        lista.innerHTML = data.map(item => `
+            <div class="stat-item">
+                <span class="stat-item-label">${item.turno}</span>
+                <span class="stat-item-value">${item.total}</span>
+            </div>
+        `).join('');
+    }
+}
+
+function actualizarGraficoArea(data) {
+    if (!charts.areas) {
+        console.error('Gráfico areas no inicializado');
+        return;
+    }
+    charts.areas.data.labels = data.map(item => item.area_trabajo);
+    charts.areas.data.datasets[0].data = data.map(item => item.total_novedades);
+    charts.areas.update();
+}
+
+function actualizarGraficoMensual(data) {
+    if (!charts.mensual) {
+        console.error('Gráfico mensual no inicializado');
+        return;
+    }
+    charts.mensual.data.labels = data.map(item => item.mes).reverse();
+    charts.mensual.data.datasets[0].data = data.map(item => item.total).reverse();
+    charts.mensual.update();
+}
+
 // Datos para gráficos
 const dataSede = <?php echo json_encode($stats['por_sede']); ?>;
 const dataTipo = <?php echo json_encode($stats['por_tipo']); ?>;
@@ -236,152 +538,304 @@ const dataDominical = <?php echo json_encode($stats['descontar_dominical']); ?>;
 const dataMensual = <?php echo json_encode($stats['por_mes']); ?>;
 const dataAreas = <?php echo json_encode(array_slice($stats['por_area'], 0, 10)); ?>;
 
-// Colores
+// Colores profesionales con gradientes
 const colors = [
-    '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-    '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#84cc16'
+    '#667eea', '#764ba2', '#f093fb', '#4facfe',
+    '#43e97b', '#fa709a', '#fee140', '#30cfd0',
+    '#a8edea', '#fed6e3', '#c471f5', '#fa71cd'
 ];
 
+const gradientColors = [
+    'rgba(102, 126, 234, 0.8)',
+    'rgba(118, 75, 162, 0.8)',
+    'rgba(240, 147, 251, 0.8)',
+    'rgba(79, 172, 254, 0.8)',
+    'rgba(67, 233, 123, 0.8)',
+    'rgba(250, 112, 154, 0.8)',
+    'rgba(254, 225, 64, 0.8)',
+    'rgba(48, 207, 208, 0.8)',
+    'rgba(168, 237, 234, 0.8)',
+    'rgba(254, 214, 227, 0.8)',
+    'rgba(196, 113, 245, 0.8)',
+    'rgba(250, 113, 205, 0.8)'
+];
+
+// Configuración común para todos los gráficos
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    animation: {
+        duration: 800,
+        easing: 'easeInOutQuart'
+    },
+    plugins: {
+        legend: {
+            display: false,
+            labels: {
+                font: {
+                    family: "'Inter', sans-serif",
+                    size: 12,
+                    weight: '600'
+                },
+                padding: 15,
+                usePointStyle: true,
+                pointStyle: 'circle'
+            }
+        },
+        tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleFont: {
+                family: "'Inter', sans-serif",
+                size: 13,
+                weight: '600'
+            },
+            bodyFont: {
+                family: "'Inter', sans-serif",
+                size: 12
+            },
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true,
+            boxPadding: 6
+        }
+    }
+};
+
 // Gráfico por Sede
-new Chart(document.getElementById('chartSede'), {
+charts.sede = new Chart(document.getElementById('chartSede'), {
     type: 'bar',
     data: {
         labels: dataSede.map(item => item.sede),
         datasets: [{
             label: 'Novedades',
             data: dataSede.map(item => item.total),
-            backgroundColor: colors,
-            borderRadius: 6
+            backgroundColor: gradientColors,
+            borderColor: colors,
+            borderWidth: 2,
+            borderRadius: 8,
+            hoverBackgroundColor: colors
         }]
     },
     options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { display: false }
-        },
+        ...commonOptions,
         scales: {
-            y: { beginAtZero: true, grid: { display: false } },
-            x: { grid: { display: false } }
+            y: { 
+                beginAtZero: true, 
+                grid: { 
+                    color: '#f1f5f9',
+                    drawBorder: false
+                },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            },
+            x: { 
+                grid: { display: false },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            }
         }
     }
 });
 
 // Gráfico por Tipo
-new Chart(document.getElementById('chartTipo'), {
+charts.tipo = new Chart(document.getElementById('chartTipo'), {
     type: 'doughnut',
     data: {
         labels: dataTipo.map(item => item.tipo),
         datasets: [{
             data: dataTipo.map(item => item.total),
-            backgroundColor: colors,
-            borderWidth: 0
+            backgroundColor: gradientColors,
+            borderColor: '#ffffff',
+            borderWidth: 3,
+            hoverOffset: 15
         }]
     },
     options: {
-        responsive: true,
-        maintainAspectRatio: true,
+        ...commonOptions,
+        cutout: '65%',
         plugins: {
-            legend: { display: false }
+            ...commonOptions.plugins,
+            legend: {
+                display: false
+            }
         }
     }
 });
 
 // Gráfico Justificación
-new Chart(document.getElementById('chartJustificacion'), {
+charts.justificacion = new Chart(document.getElementById('chartJustificacion'), {
     type: 'pie',
     data: {
         labels: dataJustificacion.map(item => item.justificacion),
         datasets: [{
             data: dataJustificacion.map(item => item.total),
             backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
-            borderWidth: 0
+            borderColor: '#ffffff',
+            borderWidth: 3,
+            hoverOffset: 12
         }]
     },
     options: {
-        responsive: true,
-        maintainAspectRatio: true,
+        ...commonOptions,
         plugins: {
-            legend: { display: false }
+            ...commonOptions.plugins,
+            legend: {
+                display: false
+            }
         }
     }
 });
 
 // Gráfico Turno
-new Chart(document.getElementById('chartTurno'), {
+charts.turno = new Chart(document.getElementById('chartTurno'), {
     type: 'bar',
     data: {
         labels: dataTurno.map(item => item.turno),
         datasets: [{
             label: 'Novedades',
             data: dataTurno.map(item => item.total),
-            backgroundColor: ['#3b82f6', '#8b5cf6'],
-            borderRadius: 6
+            backgroundColor: ['rgba(102, 126, 234, 0.8)', 'rgba(118, 75, 162, 0.8)'],
+            borderColor: ['#667eea', '#764ba2'],
+            borderWidth: 2,
+            borderRadius: 8
         }]
     },
     options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { display: false }
-        },
+        ...commonOptions,
         scales: {
-            y: { beginAtZero: true, grid: { display: false } },
-            x: { grid: { display: false } }
+            y: { 
+                beginAtZero: true, 
+                grid: { 
+                    color: '#f1f5f9',
+                    drawBorder: false
+                },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            },
+            x: { 
+                grid: { display: false },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            }
         }
     }
 });
 
 // Gráfico Mensual
-new Chart(document.getElementById('chartMensual'), {
+charts.mensual = new Chart(document.getElementById('chartMensual'), {
     type: 'line',
     data: {
         labels: dataMensual.map(item => item.mes).reverse(),
         datasets: [{
             label: 'Novedades',
             data: dataMensual.map(item => item.total).reverse(),
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
             fill: true,
             tension: 0.4,
-            borderWidth: 2
+            borderWidth: 3,
+            pointRadius: 5,
+            pointBackgroundColor: '#667eea',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 7
         }]
     },
     options: {
-        responsive: true,
+        ...commonOptions,
         maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        },
         scales: {
-            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-            x: { grid: { display: false } }
+            y: { 
+                beginAtZero: true, 
+                grid: { 
+                    color: '#f1f5f9',
+                    drawBorder: false
+                },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            },
+            x: { 
+                grid: { display: false },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            }
         }
     }
 });
 
 // Gráfico Áreas
-new Chart(document.getElementById('chartAreas'), {
+charts.areas = new Chart(document.getElementById('chartAreas'), {
     type: 'bar',
     data: {
         labels: dataAreas.map(item => item.area_trabajo),
         datasets: [{
             label: 'Novedades',
             data: dataAreas.map(item => item.total_novedades),
-            backgroundColor: colors,
-            borderRadius: 6
+            backgroundColor: gradientColors,
+            borderColor: colors,
+            borderWidth: 2,
+            borderRadius: 8
         }]
     },
     options: {
-        responsive: true,
+        ...commonOptions,
         maintainAspectRatio: false,
         indexAxis: 'y',
-        plugins: {
-            legend: { display: false }
-        },
         scales: {
-            x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-            y: { grid: { display: false } }
+            x: { 
+                beginAtZero: true, 
+                grid: { 
+                    color: '#f1f5f9',
+                    drawBorder: false
+                },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            },
+            y: { 
+                grid: { display: false },
+                ticks: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 11
+                    },
+                    color: '#64748b'
+                }
+            }
         }
     }
 });
@@ -447,83 +901,138 @@ new Chart(document.getElementById('chartComparativa'), {
 
 <style>
 /* Stats Page */
-.stats-page { background: #f8f9fa; }
+.stats-page { 
+    background: #ffffff;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
 
 .stats-header {
     background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
 }
 
 .stats-header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: #1e293b;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .stats-subtitle {
-    margin: 0.25rem 0 0 0;
-    font-size: 0.9rem;
+    margin: 0.5rem 0 0 0;
+    font-size: 1rem;
     color: #64748b;
+    font-weight: 500;
 }
 
 .btn-print {
-    padding: 0.65rem 1.25rem;
+    padding: 0.75rem 1.5rem;
     background: #3b82f6;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s;
 }
 
 .btn-print:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     background: #2563eb;
+}
+
+.btn-usuarios:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+}
+
+/* Main Stats Container - Dos columnas */
+.main-stats-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 /* Main Stat */
 .main-stat {
     background: white;
-    padding: 2.5rem;
-    border-radius: 8px;
+    padding: 3rem;
+    border-radius: 16px;
     text-align: center;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.main-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
 }
 
 .main-stat-value {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: 4rem;
+    font-weight: 800;
     color: #1e40af;
     line-height: 1;
 }
 
 .main-stat-label {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #64748b;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
+    font-weight: 600;
 }
 
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 .stat-card {
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
     overflow: hidden;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
 }
 
 .stat-card-wide {
@@ -531,45 +1040,74 @@ new Chart(document.getElementById('chartComparativa'), {
 }
 
 .stat-card-header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid #f1f5f9;
+    background: #f8fafc;
 }
 
 .stat-card-header h3 {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: #1e293b;
 }
 
 .stat-card-body {
-    padding: 1.5rem;
+    padding: 2rem;
 }
 
 .chart-container {
-    max-width: 300px;
-    margin: 0 auto 1.5rem;
+    max-width: 320px;
+    margin: 0 auto 2rem;
 }
 
 .chart-container-horizontal {
-    height: 400px;
+    height: 450px;
 }
 
 .chart-container-line {
-    height: 300px;
+    height: 320px;
 }
 
 .stat-list {
-    max-height: 300px;
+    max-height: 320px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.stat-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.stat-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.stat-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.stat-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .stat-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
+    padding: 1rem 0;
     border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s;
+}
+
+.stat-item:hover {
+    background: #f8fafc;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 8px;
 }
 
 .stat-item:last-child {
@@ -577,41 +1115,53 @@ new Chart(document.getElementById('chartComparativa'), {
 }
 
 .stat-item-label {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: #475569;
+    font-weight: 500;
 }
 
 .stat-item-value {
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: #1e293b;
 }
 
 .stat-item-value small {
     color: #64748b;
-    font-weight: 400;
+    font-weight: 500;
+    margin-left: 0.25rem;
 }
 
 /* Conclusions */
 .conclusions {
-    background: #fffbeb;
-    border-left: 4px solid #f59e0b;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: white;
+    border-left: 6px solid #3b82f6;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+    border-left: 6px solid #3b82f6;
 }
 
 .conclusions h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e40af;
+}
+
+.conclusions-subtitle {
     margin: 0 0 1rem 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #92400e;
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 500;
+    font-style: italic;
 }
 
 .conclusions-content {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: #78350f;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #475569;
 }
 
 .conclusions-content p {
@@ -621,21 +1171,22 @@ new Chart(document.getElementById('chartComparativa'), {
 /* Empty State */
 .empty-state {
     background: white;
-    padding: 3rem;
-    border-radius: 8px;
+    padding: 4rem;
+    border-radius: 16px;
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
 }
 
 .empty-state p {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: #64748b;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 /* Print */
 @media print {
-    .navbar-simple, .btn-print {
+    .navbar-simple, .btn-print, .filtro-grafico {
         display: none;
     }
     
@@ -649,7 +1200,7 @@ new Chart(document.getElementById('chartComparativa'), {
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     .stats-grid {
         grid-template-columns: 1fr;
     }
@@ -666,14 +1217,33 @@ new Chart(document.getElementById('chartComparativa'), {
         gap: 1rem;
     }
     
+    /* Hacer que las estadísticas principales se apilen en móvil */
+    .main-stats-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .main-stat {
+        padding: 2rem;
+    }
+    
     .main-stat-value {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .chart-container-horizontal {
+        height: 350px;
     }
 }
 </style>
+
+
+
+</main>
 
 <?php require_once APP_PATH . '/Views/layouts/footer.php'; ?>

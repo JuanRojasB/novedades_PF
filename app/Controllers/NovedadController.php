@@ -13,8 +13,8 @@ class NovedadController extends Controller {
         
         $user = $this->getUser();
         
-        // Usuarios con acceso al dashboard: Johanna + 4 de Gestión Humana
-        $usuariosConDashboard = ['johanna', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+        // Usuarios con acceso al dashboard: jrios (Johanna) + 4 de Gestión Humana
+        $usuariosConDashboard = ['jrios', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
         $tieneAccesoDashboard = false;
         
         foreach ($usuariosConDashboard as $userPermitido) {
@@ -50,7 +50,7 @@ class NovedadController extends Controller {
             'offset' => $offset
         ];
         
-        // Johanna ve todas las novedades (con paginación)
+        // jrios (Johanna) ve todas las novedades (con paginación)
         $novedades = $novedadModel->getAll($filters);
         $totalNovedades = $novedadModel->getTotalNovedades($filters); // Total sin paginación
         $totalPaginas = ceil($totalNovedades / $porPagina);
@@ -63,7 +63,7 @@ class NovedadController extends Controller {
         $areaModel = new \Models\AreaTrabajo();
         
         $data = [
-            'title' => 'Dashboard',
+            'title' => 'NOVEDADES',
             'user' => $user,
             'novedades' => $novedades,
             'totalNovedades' => $totalNovedades,
@@ -89,8 +89,8 @@ class NovedadController extends Controller {
             $sedesDisponibles = [];
             $areasDisponibles = [];
             
-            // Si NO es Johanna, restringir según configuración
-            if (stripos($user['nombre'], 'johanna') === false) {
+            // Si NO es jrios (Johanna), restringir según configuración
+            if (stripos($user['nombre'], 'johanna') === false && $user['usuario'] !== 'jrios') {
                 
                 // Jefes con acceso a múltiples sedes/áreas (basado en datos históricos)
                 $jefesMultiples = [
@@ -230,7 +230,7 @@ class NovedadController extends Controller {
                     }
                 }
             } else {
-                // Johanna ve todas las sedes y áreas
+                // jrios (Johanna) ve todas las sedes y áreas
                 $sedeModel = new \Models\Sede();
                 $areaModel = new \Models\AreaTrabajo();
                 $sedesDisponibles = $sedeModel->getAll();
@@ -376,11 +376,12 @@ class NovedadController extends Controller {
                     
                     // Correos que deben recibir TODAS las novedades (5 usuarios)
                     $correosDestino = [
-                        'r.humanos@pollo-fiesta.com',           // ELSA BECERRA
-                        'AuxiliarGH2@pollo-fiesta.com',         // CATHERINE ORTIZ
-                        'AuxiliarGH1@pollo-fiesta.com',         // CARMENZA MARTINEZ
-                        'profesionalnomina@pollo-fiesta.com',   // MICHELLE VELANDIA
-                        'innovacion@pollo-fiesta.com'           // JOHANNA
+                        //'r.humanos@pollo-fiesta.com',           // ELSA BECERRA
+                        //'AuxiliarGH2@pollo-fiesta.com',         // CATHERINE ORTIZ
+                        //'AuxiliarGH1@pollo-fiesta.com',         // CARMENZA MARTINEZ
+                        //'profesionalnomina@pollo-fiesta.com',   // MICHELLE VELANDIA
+                        //'dirgestionhumana@pollo-fiesta.com'     // JOHANNA (jrios)
+                        'pasantesistemas1@pollo-fiesta.com'       // ENTORNO DE PRUEBA
                     ];
                     
                     // MODO PRUEBA: Enviar todos los correos a pasantesistemas1@pollo-fiesta.com
@@ -445,8 +446,8 @@ class NovedadController extends Controller {
                     $_SESSION['success'] = 'Formulario enviado correctamente.';
                 }
                 
-                // Johanna va al listado, usuarios normales vuelven al formulario
-                if (stripos($user['nombre'], 'johanna') !== false) {
+                // jrios (Johanna) va al listado, usuarios normales vuelven al formulario
+                if (stripos($user['nombre'], 'johanna') !== false || $user['usuario'] === 'jrios') {
                     $this->redirect('novedades');
                 } else {
                     $this->redirect('novedades/crear');
@@ -475,8 +476,8 @@ class NovedadController extends Controller {
         $this->requireAuth();
         $user = $this->getUser();
         
-        // Usuarios con acceso a estadísticas: Johanna + 4 de Gestión Humana
-        $usuariosConDashboard = ['johanna', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+        // Usuarios con acceso a estadísticas: jrios (Johanna) + 4 de Gestión Humana
+        $usuariosConDashboard = ['jrios', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
         $tieneAcceso = false;
         
         foreach ($usuariosConDashboard as $userPermitido) {
@@ -493,30 +494,247 @@ class NovedadController extends Controller {
         
         $novedadModel = new Novedad();
         
-        // Obtener filtro de tiempo
-        $filtroTiempo = $_GET['filtro_tiempo'] ?? 'todos';
+        // Obtener filtros individuales para cada gráfico (todos inician en "todos")
+        $filtroSede = $_GET['filtro_sede'] ?? 'todos';
+        $filtroTipo = $_GET['filtro_tipo'] ?? 'todos';
+        $filtroJustificacion = $_GET['filtro_justificacion'] ?? 'todos';
+        $filtroArea = $_GET['filtro_area'] ?? 'todos';
+        $filtroTurno = $_GET['filtro_turno'] ?? 'todos';
+        $filtroDominical = $_GET['filtro_dominical'] ?? 'todos';
+        $filtroMensual = $_GET['filtro_mensual'] ?? 'todos';
         
-        // Obtener estadísticas generales
+        // Obtener estadísticas con filtros individuales
         $stats = [
             'total_novedades' => $novedadModel->getTotalNovedades(),
-            'por_sede' => $novedadModel->getNovedadesPorSede(),
-            'por_tipo' => $novedadModel->getNovedadesPorTipo(),
-            'por_justificacion' => $novedadModel->getNovedadesPorJustificacion(),
-            'por_area' => $novedadModel->getEstadisticasPorZona(),
-            'por_turno' => $novedadModel->getNovedadesPorTurno(),
-            'descontar_dominical' => $novedadModel->getNovedadesDescontarDominical(),
-            'por_mes' => $novedadModel->getNovedadesPorMes($filtroTiempo),
+            'por_sede' => $novedadModel->getNovedadesPorSede($filtroSede),
+            'por_tipo' => $novedadModel->getNovedadesPorTipo($filtroTipo),
+            'por_justificacion' => $novedadModel->getNovedadesPorJustificacion($filtroJustificacion),
+            'por_area' => $novedadModel->getEstadisticasPorZona($filtroArea),
+            'por_turno' => $novedadModel->getNovedadesPorTurno($filtroTurno),
+            'descontar_dominical' => $novedadModel->getNovedadesDescontarDominical($filtroDominical),
+            'por_mes' => $novedadModel->getNovedadesPorMes($filtroMensual),
             'comparativa' => $novedadModel->getComparativa2025vs2026(),
-            'top_responsables' => $novedadModel->getTopResponsables()
+            'top_responsables' => $novedadModel->getTopResponsables(),
+            // DATOS SIN FILTROS PARA CONCLUSIONES
+            'conclusiones' => [
+                'por_tipo' => $novedadModel->getNovedadesPorTipo('todos'),
+                'por_justificacion' => $novedadModel->getNovedadesPorJustificacion('todos'),
+                'descontar_dominical' => $novedadModel->getNovedadesDescontarDominical('todos')
+            ]
         ];
+        
+        // Obtener total de empleados con novedades
+        $totalEmpleadosConNovedades = $novedadModel->getTotalEmpleadosConNovedades();
         
         $data = [
             'title' => 'Estadísticas y Gráficos',
             'user' => $user,
             'stats' => $stats,
-            'filtro_tiempo' => $filtroTiempo
+            'totalEmpleadosConNovedades' => $totalEmpleadosConNovedades,
+            'filtros' => [
+                'sede' => $filtroSede,
+                'tipo' => $filtroTipo,
+                'justificacion' => $filtroJustificacion,
+                'area' => $filtroArea,
+                'turno' => $filtroTurno,
+                'dominical' => $filtroDominical,
+                'mensual' => $filtroMensual
+            ]
         ];
         
         $this->view('novedades/estadisticas', $data);
+    }
+    
+    // API para actualizar gráficos sin recargar la página
+    public function apiEstadisticas() {
+        $this->requireAuth();
+        
+        header('Content-Type: application/json');
+        
+        $grafico = $_GET['grafico'] ?? '';
+        $filtro = $_GET['filtro'] ?? 'todos';
+        
+        $novedadModel = new Novedad();
+        $data = [];
+        
+        switch($grafico) {
+            case 'sede':
+                $data = $novedadModel->getNovedadesPorSede($filtro);
+                break;
+            case 'tipo':
+                $data = $novedadModel->getNovedadesPorTipo($filtro);
+                break;
+            case 'justificacion':
+                $data = $novedadModel->getNovedadesPorJustificacion($filtro);
+                break;
+            case 'turno':
+                $data = $novedadModel->getNovedadesPorTurno($filtro);
+                break;
+            case 'area':
+                $data = $novedadModel->getEstadisticasPorZona($filtro);
+                break;
+            case 'mensual':
+                $data = $novedadModel->getNovedadesPorMes($filtro);
+                break;
+        }
+        
+        echo json_encode($data);
+        exit;
+    }
+    
+    public function listarUsuarios() {
+        $this->requireAuth();
+        $user = $this->getUser();
+        
+        // Forzar UTF-8 en la respuesta
+        header('Content-Type: text/html; charset=utf-8');
+        mb_internal_encoding('UTF-8');
+        
+        // Solo usuarios con acceso al dashboard pueden ver estadísticas de empleados
+        $usuariosConDashboard = ['jrios', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+        $tieneAcceso = false;
+        
+        foreach ($usuariosConDashboard as $userPermitido) {
+            if (stripos($user['nombre'], $userPermitido) !== false || $user['usuario'] === $userPermitido) {
+                $tieneAcceso = true;
+                break;
+            }
+        }
+        
+        if (!$tieneAcceso) {
+            $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
+            $this->redirect('novedades');
+            return;
+        }
+        
+        $novedadModel = new Novedad();
+        
+        // Obtener estadísticas por empleado
+        $estadisticasEmpleados = $novedadModel->getEstadisticasPorEmpleado();
+        $totalEmpleados = count($estadisticasEmpleados);
+        
+        // Obtener estadísticas de tipos de novedad para el gráfico de torta
+        $tiposNovedad = $novedadModel->getEstadisticasTiposNovedad();
+        
+        // Mostrar TODOS los empleados (no solo top 20)
+        $todosEmpleados = $estadisticasEmpleados;
+        
+        $data = [
+            'title' => 'Estadísticas por Empleado',
+            'user' => $user,
+            'empleados' => $todosEmpleados,
+            'totalEmpleados' => $totalEmpleados,
+            'estadisticasCompletas' => $estadisticasEmpleados,
+            'tiposNovedad' => $tiposNovedad
+        ];
+        
+        $this->view('usuarios/lista', $data);
+    }
+    
+    public function apiEmpleadoDetalle() {
+        $this->requireAuth();
+        
+        $cedula = $_GET['cedula'] ?? '';
+        
+        if (empty($cedula)) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'Cédula requerida'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        
+        $novedadModel = new Novedad();
+        
+        // Obtener todas las novedades del empleado por cédula
+        $novedades = $novedadModel->getNovedadesPorEmpleado('', $cedula);
+        
+        if (empty($novedades)) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'No se encontraron novedades para este empleado'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        
+        // Obtener estadísticas de tipos de novedad para este empleado
+        $tiposNovedadEmpleado = $novedadModel->getEstadisticasTiposNovedadPorEmpleado($cedula);
+        
+        // Calcular resumen
+        $resumen = [
+            'total_novedades' => count($novedades),
+            'ausencias' => 0,
+            'incapacidades' => 0,
+            'vacaciones' => 0,
+            'permisos' => 0,
+            'justificadas' => 0,
+            'no_justificadas' => 0
+        ];
+        
+        foreach ($novedades as $novedad) {
+            if ($novedad['novedad'] === 'AUSENCIA') $resumen['ausencias']++;
+            if ($novedad['novedad'] === 'INCAPACIDAD') $resumen['incapacidades']++;
+            if ($novedad['novedad'] === 'VACACIONES') $resumen['vacaciones']++;
+            if (strpos($novedad['novedad'], 'PERMISO') !== false) $resumen['permisos']++;
+            if ($novedad['justificacion'] === 'SI') $resumen['justificadas']++;
+            else $resumen['no_justificadas']++;
+        }
+        
+        // Tomar información del empleado de la novedad más reciente
+        $empleado = [
+            'nombres_apellidos' => $novedades[0]['nombres_apellidos'],
+            'numero_cedula' => $novedades[0]['numero_cedula'],
+            'sede' => $novedades[0]['sede'],
+            'area_trabajo' => $novedades[0]['area_trabajo']
+        ];
+        
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'empleado' => $empleado,
+            'resumen' => $resumen,
+            'novedades' => $novedades,
+            'tiposNovedad' => $tiposNovedadEmpleado
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    
+    public function apiNovedadDetalle() {
+        $this->requireAuth();
+        
+        $id = $_GET['id'] ?? '';
+        
+        if (empty($id)) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'ID de novedad requerido'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        
+        $novedadModel = new Novedad();
+        $novedad = $novedadModel->getById($id);
+        
+        if (!$novedad) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'Novedad no encontrada'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($novedad, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    
+    public function apiNovedadAdjuntos() {
+        $this->requireAuth();
+        
+        $id = $_GET['id'] ?? '';
+        
+        if (empty($id)) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'ID de novedad requerido'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        
+        $archivoModel = new \Models\ArchivoAdjunto();
+        $adjuntos = $archivoModel->getByNovedadId($id);
+        
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['adjuntos' => $adjuntos], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 }

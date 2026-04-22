@@ -1,137 +1,157 @@
 <?php
 // app/Helpers/MailHelper.php
-// Envío de correos via SMTP sin dependencias externas
+// Envío de correos via SMTP usando PHPMailer
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class MailHelper {
 
     private $config;
+    private $lastError = '';
+    private $mailer;
 
     public function __construct() {
         $this->config = require CONFIG_PATH . '/config.php';
         $this->config = $this->config['mail'];
+        
+        // Solo inicializar PHPMailer si el modo es SMTP
+        if ($this->config['mode'] === 'smtp') {
+            $this->mailer = new PHPMailer(true);
+            $this->configurarSMTP();
+        }
+    }
+
+    /**
+     * Configurar PHPMailer con los datos SMTP
+     */
+    private function configurarSMTP(): void {
+        try {
+            // Configuración del servidor
+            $this->mailer->isSMTP();
+            $this->mailer->Host       = $this->config['host'];
+            $this->mailer->SMTPAuth   = true;
+            $this->mailer->Username   = $this->config['username'];
+            $this->mailer->Password   = $this->config['password'];
+            $this->mailer->Port       = $this->config['port'];
+            
+            // Configurar HELO/EHLO con el nombre del servidor (FIX para error 550)
+            $this->mailer->Hostname   = $this->config['host'];
+            
+            // Configurar encriptación
+            if ($this->config['encryption'] === 'ssl') {
+                $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($this->config['encryption'] === 'tls') {
+                $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            }
+            
+            // Configuración adicional
+            $this->mailer->CharSet = 'UTF-8';
+            $this->mailer->setFrom($this->config['from_email'], $this->config['from_name']);
+            
+            // Debug (desactivado en producción)
+            $this->mailer->SMTPDebug = 0;
+            
+        } catch (Exception $e) {
+            $this->lastError = "Error al configurar SMTP: " . $e->getMessage();
+            error_log("MailHelper: " . $this->lastError);
+        }
+    }
+
+    /**
+     * Obtener el último error
+     */
+    public function getError(): string {
+        return $this->lastError;
     }
 
     /**
      * Enviar correo de nueva novedad registrada
      */
     public function enviarNovedad(array $novedad, string $destinatario): bool {
-        $asunto = "Nueva Novedad Registrada - {$novedad['nombres_apellidos']}";
-        $cuerpo  = $this->plantillaNovedad($novedad);
-        return $this->enviar($destinatario, $asunto, $cuerpo);
+        // Modo FILE: Guardar como HTML
+        if ($this->config['mode'] === 'file') {
+            return $this->guardarComoArchivo($novedad, $destinatario);
+        }
+        
+        // Modo SMTP: Enviar por correo
+        try {
+            $this->mailer->clearAddresses();
+            $this->mailer->clearAttachments();
+            $this->mailer->addAddress($destinatario);
+            $this->mailer->isHTML(true);
+            $this->mailer->Subject = "Nueva Novedad Registrada - {$novedad['nombres_apellidos']}";
+            $this->mailer->Body    = $this->plantillaNovedad($novedad);
+            
+            if ($this->mailer->send()) {
+                return true;
+            }
+            
+            $this->lastError = "Error al enviar: " . $this->mailer->ErrorInfo;
+            return false;
+            
+        } catch (Exception $e) {
+            $this->lastError = "Excepción al enviar: " . $e->getMessage();
+            error_log("MailHelper Exception: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Guardar correo como archivo HTML (modo desarrollo)
+     */
+    private function guardarComoArchivo(array $novedad, string $destinatario): bool {
+        try {
+            $html = $this->plantillaNovedad($novedad);
+            $fecha = date('Y-m-d_H-i-s');
+            $id = uniqid();
+            $filename = "correo_{$fecha}_{$id}.html";
+            $filepath = STORAGE_PATH . '/' . $filename;
+            
+            if (file_put_contents($filepath, $html)) {
+                error_log("MailHelper: Correo guardado en {$filename}");
+                return true;
+            }
+            
+            $this->lastError = "No se pudo guardar el archivo";
+            return false;
+            
+        } catch (Exception $e) {
+            $this->lastError = "Error al guardar: " . $e->getMessage();
+            return false;
+        }
     }
 
     /**
      * Enviar correo genérico
      */
     public function enviar(string $para, string $asunto, string $cuerpoHtml): bool {
-        $host       = $this->config['host'];
-        $port       = $this->config['port'];
-        $encryption = $this->config['encryption'];
-        $user       = $this->config['username'];
-        $pass       = $this->config['password'];
-        $fromEmail  = $this->config['from_email'];
-        $fromName   = $this->config['from_name'];
-
         try {
-            // Conectar al servidor SMTP
-            if ($encryption === 'ssl') {
-                $socket = fsockopen("ssl://{$host}", $port, $errno, $errstr, 30);
-            } else {
-                $socket = fsockopen($host, $port, $errno, $errstr, 30);
-            }
-
-            if (!$socket) {
-                error_log("MailHelper: No se pudo conectar al servidor SMTP: {$errstr} ({$errno})");
-                return false;
-            }
-
-            // Leer bienvenida
-            $this->leer($socket);
-
-            // EHLO
-            $this->escribir($socket, "EHLO {$host}");
-            $this->leer($socket);
-
-            // STARTTLS si es tls
-            if ($encryption === 'tls') {
-                $this->escribir($socket, "STARTTLS");
-                $this->leer($socket);
-                stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-                $this->escribir($socket, "EHLO {$host}");
-                $this->leer($socket);
-            }
-
-            // Autenticación
-            $this->escribir($socket, "AUTH LOGIN");
-            $this->leer($socket);
-            $this->escribir($socket, base64_encode($user));
-            $this->leer($socket);
-            $this->escribir($socket, base64_encode($pass));
-            $respAuth = $this->leer($socket);
-
-            if (strpos($respAuth, '235') === false) {
-                error_log("MailHelper: Autenticación fallida: {$respAuth}");
-                fclose($socket);
-                return false;
-            }
-
-            // MAIL FROM
-            $this->escribir($socket, "MAIL FROM:<{$fromEmail}>");
-            $this->leer($socket);
-
-            // RCPT TO
-            $this->escribir($socket, "RCPT TO:<{$para}>");
-            $this->leer($socket);
-
-            // DATA
-            $this->escribir($socket, "DATA");
-            $this->leer($socket);
-
-            // Cabeceras y cuerpo
-            $fecha    = date('r');
-            $boundary = md5(uniqid());
-            $mensaje  = "From: =?UTF-8?B?" . base64_encode($fromName) . "?= <{$fromEmail}>\r\n";
-            $mensaje .= "To: {$para}\r\n";
-            $mensaje .= "Subject: =?UTF-8?B?" . base64_encode($asunto) . "?=\r\n";
-            $mensaje .= "Date: {$fecha}\r\n";
-            $mensaje .= "MIME-Version: 1.0\r\n";
-            $mensaje .= "Content-Type: text/html; charset=UTF-8\r\n";
-            $mensaje .= "Content-Transfer-Encoding: base64\r\n";
-            $mensaje .= "\r\n";
-            $mensaje .= chunk_split(base64_encode($cuerpoHtml));
-            $mensaje .= "\r\n.\r\n";
-
-            fwrite($socket, $mensaje);
-            $respData = $this->leer($socket);
-
-            // QUIT
-            $this->escribir($socket, "QUIT");
-            fclose($socket);
-
-            if (strpos($respData, '250') !== false) {
+            // Limpiar destinatarios previos
+            $this->mailer->clearAddresses();
+            $this->mailer->clearAttachments();
+            
+            // Configurar destinatario
+            $this->mailer->addAddress($para);
+            
+            // Configurar asunto y cuerpo
+            $this->mailer->isHTML(true);
+            $this->mailer->Subject = $asunto;
+            $this->mailer->Body    = $cuerpoHtml;
+            
+            // Enviar
+            if ($this->mailer->send()) {
                 return true;
             }
-
-            error_log("MailHelper: Error al enviar: {$respData}");
+            
+            $this->lastError = "Error al enviar: " . $this->mailer->ErrorInfo;
             return false;
-
-        } catch (\Exception $e) {
+            
+        } catch (Exception $e) {
+            $this->lastError = "Excepción al enviar: " . $e->getMessage();
             error_log("MailHelper Exception: " . $e->getMessage());
             return false;
         }
-    }
-
-    private function escribir($socket, string $cmd): void {
-        fwrite($socket, $cmd . "\r\n");
-    }
-
-    private function leer($socket): string {
-        $respuesta = '';
-        while ($linea = fgets($socket, 515)) {
-            $respuesta .= $linea;
-            if (substr($linea, 3, 1) === ' ') break;
-        }
-        return $respuesta;
     }
 
     /**

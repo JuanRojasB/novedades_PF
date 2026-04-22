@@ -2,7 +2,7 @@
     <div class="nav-container">
         <div class="nav-brand">
             <img src="<?php echo asset_url('img/logo-pollo-fiesta.png'); ?>" alt="Pollo Fiesta" class="nav-logo">
-            <span class="brand-name">Sistema de Novedades</span>
+            <span class="brand-name">Informe de Novedades Diarias</span>
         </div>
         
         <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
@@ -14,8 +14,8 @@
         <div class="nav-menu" id="navMenu">
             <div class="nav-center">
                 <?php 
-                // Usuarios con acceso al dashboard: Johanna + 4 de Gestión Humana
-                $usuariosConDashboard = ['johanna', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+                // Usuarios con acceso al dashboard: jrios (Johanna) + 4 de Gestión Humana
+                $usuariosConDashboard = ['jrios', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
                 $tieneAccesoDashboard = false;
                 
                 if (isset($_SESSION['user'])) {
@@ -28,9 +28,9 @@
                 }
                 
                 if ($tieneAccesoDashboard): ?>
-                    <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Dashboard</a>
-                    <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Estadísticas</a>
-                    <?php if (stripos($_SESSION['user']['nombre'], 'johanna') !== false): ?>
+                    <a href="<?php echo base_url('novedades'); ?>" class="nav-link">Novedades</a>
+                    <a href="<?php echo base_url('estadisticas'); ?>" class="nav-link">Dashboard</a>
+                    <?php if (stripos($_SESSION['user']['nombre'], 'johanna') !== false || $_SESSION['user']['usuario'] === 'jrios'): ?>
                         <a href="<?php echo base_url('admin'); ?>" class="nav-link">Administración</a>
                     <?php endif; ?>
                 <?php endif; ?>
