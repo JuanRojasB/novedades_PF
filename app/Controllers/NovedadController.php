@@ -13,8 +13,18 @@ class NovedadController extends Controller {
         
         $user = $this->getUser();
         
-        // Solo Johanna puede ver el listado de novedades
-        if (stripos($user['nombre'], 'johanna') === false) {
+        // Usuarios con acceso al dashboard: Johanna + 4 de Gestión Humana
+        $usuariosConDashboard = ['johanna', 'ebecerra', 'cortiz', 'cmartinez', 'mvelandia'];
+        $tieneAccesoDashboard = false;
+        
+        foreach ($usuariosConDashboard as $userPermitido) {
+            if (stripos($user['nombre'], $userPermitido) !== false || $user['username'] === $userPermitido) {
+                $tieneAccesoDashboard = true;
+                break;
+            }
+        }
+        
+        if (!$tieneAccesoDashboard) {
             // Usuarios normales van directo al formulario
             $this->redirect('novedades/crear');
             return;
@@ -358,55 +368,57 @@ class NovedadController extends Controller {
                     }
                 }
                 
-                // Enviar correo de notificación
-                $correoEnviado = false;
+                // Enviar correos de notificación
+                $correosEnviados = 0;
                 try {
                     // Agregar el ID a los datos para el correo
                     $datos['id'] = $novedad_id;
                     
+                    // Correos de Gestión Humana que deben recibir TODAS las novedades
+                    $correosGestionHumana = [
+                        'r.humanos@pollo-fiesta.com',           // ELSA BECERRA
+                        'AuxiliarGH2@pollo-fiesta.com',         // CATHERINE ORTIZ
+                        'AuxiliarGH1@pollo-fiesta.com',         // CARMENZA MARTINEZ
+                        'profesionalnomina@pollo-fiesta.com'    // MICHELLE VELANDIA
+                    ];
+                    
                     // DESARROLLO LOCAL: Usar simulador de correo
                     if ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) {
                         require_once APP_PATH . '/Helpers/MailHelperLocal.php';
-                        $mailer = new MailHelperLocal();
-                        $correoEnviado = $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
-                        error_log("📧 DESARROLLO: Correo simulado - Resultado: " . ($correoEnviado ? 'ÉXITO' : 'ERROR'));
+                        $mailer = new \MailHelperLocal();
+                        
+                        // Enviar a cada usuario de Gestión Humana
+                        foreach ($correosGestionHumana as $correo) {
+                            if ($mailer->enviarNovedad($datos, $correo)) {
+                                $correosEnviados++;
+                                error_log("📧 DESARROLLO: Correo simulado enviado a {$correo}");
+                            }
+                        }
                     } else {
                         // PRODUCCIÓN: Usar correo real
                         require_once APP_PATH . '/Helpers/MailHelper.php';
-                        $mailer = new MailHelper();
-                        $correoEnviado = $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
+                        $mailer = new \MailHelper();
                         
-                        if ($correoEnviado) {
-                            error_log("✓ Correo enviado exitosamente a innovacion@pollo-fiesta.com");
-                        } else {
-                            error_log("✗ No se pudo enviar el correo");
+                        // Enviar a cada usuario de Gestión Humana
+                        foreach ($correosGestionHumana as $correo) {
+                            if ($mailer->enviarNovedad($datos, $correo)) {
+                                $correosEnviados++;
+                                error_log("✓ Correo enviado exitosamente a {$correo}");
+                            } else {
+                                error_log("✗ No se pudo enviar el correo a {$correo}");
+                            }
                         }
                     }
                     
-                    /* PRODUCCIÓN: Descomentar esto cuando esté listo
-                    // Obtener el correo del usuario logueado
-                    $usuarioModel = new \Models\Usuario();
-                    $usuarioData = $usuarioModel->getByUsername($user['username']);
-                    
-                    if ($usuarioData && !empty($usuarioData['email'])) {
-                        // Enviar al correo del usuario
-                        $mailer->enviarNovedad($datos, $usuarioData['email']);
-                    } else {
-                        // Si no tiene correo, enviar a correo genérico
-                        $mailer->enviarNovedad($datos, 'innovacion@pollo-fiesta.com');
-                        error_log("Usuario {$user['username']} no tiene correo configurado");
-                    }
-                    */
                 } catch (\Exception $e) {
-                    error_log("Error enviando correo: " . $e->getMessage());
+                    error_log("Error enviando correos: " . $e->getMessage());
                     // No interrumpir el flujo si falla el correo
                 }
                 
-                // Mensaje de éxito (siempre se muestra, aunque falle el correo)
-                if ($correoEnviado) {
-                    $_SESSION['success'] = 'Formulario enviado correctamente. Se ha enviado una notificación por correo.';
+                // Mensaje de éxito
+                if ($correosEnviados > 0) {
+                    $_SESSION['success'] = 'Formulario enviado correctamente. Se han enviado ' . $correosEnviados . ' notificaciones por correo a Gestión Humana.';
                 } else {
-                    // En desarrollo local, el correo no se envía pero la novedad SÍ se guarda
                     $_SESSION['success'] = 'Formulario enviado correctamente.';
                 }
                 
