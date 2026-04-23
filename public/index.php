@@ -72,6 +72,18 @@ if ($path === 'api/empleado-detalle') {
     exit;
 }
 
+if ($path === 'api/novedad-detalle') {
+    $controller = new Controllers\NovedadController();
+    $controller->apiNovedadDetalle();
+    exit;
+}
+
+if ($path === 'api/novedad-adjuntos') {
+    $controller = new Controllers\NovedadController();
+    $controller->apiNovedadAdjuntos();
+    exit;
+}
+
 if (preg_match('#^api/zonas/(\d+)$#', $path, $matches)) {
     $controller = new Controllers\ApiController();
     $controller->zonas($matches[1]);

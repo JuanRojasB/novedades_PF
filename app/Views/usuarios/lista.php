@@ -738,7 +738,6 @@ function mostrarDetalleEmpleado(data) {
                 <strong>Información:</strong> Esta tabla muestra TODOS los registros de novedades para la cédula <strong>${data.empleado.numero_cedula}</strong>. 
                 Si el nombre aparece escrito de diferentes maneras, es porque fue registrado así en diferentes ocasiones. 
                 El sistema agrupa por cédula para evitar duplicados del mismo empleado.
-                ${!tieneZonasGeograficas ? ' La columna "Zona Geográfica" se oculta porque no hay datos registrados.' : ''}
             </p>
         </div>`;
     

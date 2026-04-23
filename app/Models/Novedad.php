@@ -190,9 +190,14 @@ class Novedad {
     }
 
     public function getById($id) {
-        $stmt = $this->db->prepare("SELECT * FROM novedades WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM novedades WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            error_log('getById error: ' . $e->getMessage());
+            return null;
+        }
     }
     
     public function create($data) {
@@ -462,12 +467,9 @@ class Novedad {
         try {
             $stmt = $this->db->query("
                 SELECT 
-                    -- Tomar el nombre más reciente para cada cédula
                     (SELECT nombres_apellidos FROM novedades n2 WHERE n2.numero_cedula = n.numero_cedula ORDER BY n2.created_at DESC LIMIT 1) as nombres_apellidos,
                     numero_cedula,
-                    -- Tomar la sede más reciente
                     (SELECT sede FROM novedades n3 WHERE n3.numero_cedula = n.numero_cedula ORDER BY n3.created_at DESC LIMIT 1) as sede,
-                    -- Tomar el área más reciente
                     (SELECT area_trabajo FROM novedades n4 WHERE n4.numero_cedula = n.numero_cedula ORDER BY n4.created_at DESC LIMIT 1) as area_trabajo,
                     COUNT(*) as total_novedades,
                     SUM(CASE WHEN novedad = 'AUSENCIA' THEN 1 ELSE 0 END) as ausencias,
@@ -483,11 +485,13 @@ class Novedad {
                     MAX(fecha_novedad) as ultima_novedad,
                     MAX(created_at) as ultimo_registro
                 FROM novedades n
+                WHERE numero_cedula IS NOT NULL AND numero_cedula != ''
                 GROUP BY numero_cedula
                 ORDER BY total_novedades DESC, nombres_apellidos ASC
             ");
             return $stmt->fetchAll();
         } catch (Exception $e) {
+            error_log('getEstadisticasPorEmpleado error: ' . $e->getMessage());
             return [];
         }
     }
@@ -546,8 +550,8 @@ class Novedad {
             $stmt = $this->db->prepare("
                 SELECT 
                     id, fecha_novedad, nombres_apellidos, numero_cedula, sede, zona_geografica,
-                    area_trabajo, turno, novedad, justificacion, descontar_dominical,
-                    observacion_novedad, nota, responsable, created_at, updated_at
+                    area_trabajo, turno, novedad, justificacion, es_correccion, motivo_correccion,
+                    descontar_dominical, observacion_novedad, nota, responsable, created_at, updated_at
                 FROM novedades 
                 WHERE numero_cedula = ?
                 ORDER BY fecha_novedad DESC, created_at DESC
@@ -555,6 +559,7 @@ class Novedad {
             $stmt->execute([$cedula]);
             return $stmt->fetchAll();
         } catch (Exception $e) {
+            error_log('getNovedadesPorEmpleado error: ' . $e->getMessage());
             return [];
         }
     }
