@@ -3,7 +3,8 @@
 header('Content-Type: text/html; charset=utf-8');
 mb_internal_encoding('UTF-8');
 
-$css_files = []; 
+$css_files = [];
+$is_fia = true;
 require_once APP_PATH . '/Views/layouts/header.php'; 
 ?>
 
@@ -15,11 +16,14 @@ require_once APP_PATH . '/Views/layouts/header.php';
 
     <!-- Header -->
     <div class="page-header">
-        <div>
-            <h1>Estadísticas por Empleado</h1>
-            <p style="color: #64748b; margin: 0.5rem 0 0 0;">
-                Total de empleados con novedades: <strong><?php echo $totalEmpleados; ?></strong>
-            </p>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <img src="<?php echo asset_url('img/pollo_fiesta_FIA.png'); ?>" alt="FIA" style="height: 52px; width: auto; object-fit: contain;">
+            <div>
+                <h1>Estadísticas por Empleado <span style="color: #3b82f6;">FIA</span></h1>
+                <p style="color: #64748b; margin: 0.5rem 0 0 0;">
+                    Total de empleados con novedades: <strong><?php echo $totalEmpleados; ?></strong>
+                </p>
+            </div>
         </div>
         <a href="<?php echo base_url('estadisticas'); ?>" class="btn-secondary">← Volver al Dashboard</a>
     </div>

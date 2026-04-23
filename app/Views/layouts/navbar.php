@@ -1,8 +1,13 @@
 <nav class="navbar-simple">
     <div class="nav-container">
         <div class="nav-brand">
-            <img src="<?php echo asset_url('img/logo-pollo-fiesta.png'); ?>" alt="Pollo Fiesta" class="nav-logo">
-            <span class="brand-name">Informe de Novedades Diarias</span>
+            <?php if (isset($is_fia) && $is_fia): ?>
+                <img src="<?php echo asset_url('img/pollo_fiesta_FIA.png'); ?>" alt="FIA" class="nav-logo">
+                <span class="brand-name">Informe de Novedades Diarias - FIA</span>
+            <?php else: ?>
+                <img src="<?php echo asset_url('img/logo-pollo-fiesta.png'); ?>" alt="Pollo Fiesta" class="nav-logo">
+                <span class="brand-name">Informe de Novedades Diarias</span>
+            <?php endif; ?>
         </div>
         
         <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">

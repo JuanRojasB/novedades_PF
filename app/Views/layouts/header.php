@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $title ?? 'Sistema de Novedades'; ?> - Pollo Fiesta</title>
-    <link rel="icon" type="image/png" href="<?php echo asset_url('img/logo-pollo-fiesta.png'); ?>">
+    <?php if (isset($is_fia) && $is_fia): ?>
+        <title><?php echo $title ?? 'Sistema de Novedades'; ?> - FIA</title>
+        <link rel="icon" type="image/png" href="<?php echo asset_url('img/pollo_fiesta_FIA.png'); ?>">
+    <?php else: ?>
+        <title><?php echo $title ?? 'Sistema de Novedades'; ?> - Pollo Fiesta</title>
+        <link rel="icon" type="image/png" href="<?php echo asset_url('img/logo-pollo-fiesta.png'); ?>">
+    <?php endif; ?>
     <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo time(); ?>">
     <?php if (isset($css_files)): ?>
         <?php foreach ($css_files as $css): ?>

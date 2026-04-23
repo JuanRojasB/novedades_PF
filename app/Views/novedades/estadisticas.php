@@ -1,4 +1,4 @@
-<?php $css_files = []; require_once APP_PATH . '/Views/layouts/header.php'; ?>
+<?php $css_files = []; $is_fia = true; require_once APP_PATH . '/Views/layouts/header.php'; ?>
 
 <body class="simple-layout">
 
@@ -7,9 +7,12 @@
 <main class="app-main stats-page">
     <!-- Header -->
     <div class="stats-header">
-        <div>
-            <h1>Estadísticas y Gráficos</h1>
-            <p class="stats-subtitle">Informe de Novedades</p>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <img src="<?php echo asset_url('img/pollo_fiesta_FIA.png'); ?>" alt="FIA" style="height: 52px; width: auto; object-fit: contain;">
+            <div>
+                <h1>Estadísticas y Gráficos <span style="color: #3b82f6;">FIA</span></h1>
+                <p class="stats-subtitle">Informe de Novedades</p>
+            </div>
         </div>
     </div>
 
