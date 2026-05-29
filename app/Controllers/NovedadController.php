@@ -115,16 +115,16 @@ class NovedadController extends Controller {
                     // Cargar sedes asignadas
                     $sedeModel = new \Models\Sede();
                     $todasLasSedes = $sedeModel->getAll();
-                    $sedesDisponibles = array_filter($todasLasSedes, function($sede) use ($config) {
+                    $sedesDisponibles = array_values(array_filter($todasLasSedes, function($sede) use ($config) {
                         return in_array($sede['nombre'], $config['sedes']);
-                    });
+                    }));
                     
                     // Cargar áreas asignadas
                     $areaModel = new \Models\AreaTrabajo();
                     $todasLasAreas = $areaModel->getAll();
-                    $areasDisponibles = array_filter($todasLasAreas, function($area) use ($config) {
+                    $areasDisponibles = array_values(array_filter($todasLasAreas, function($area) use ($config) {
                         return in_array($area['nombre'], $config['areas']);
-                    });
+                    }));
                     
                 } else {
                     // Mapeo simple de usuarios a una sola sede y área
